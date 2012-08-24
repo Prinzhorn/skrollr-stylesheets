@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html class="no-skrollr">
+<head>
+	<meta charset="utf-8" />
+
+	<title>skrollr test suite</title>
+
+	<link rel="stylesheet" type="text/css" href="qunit.css" data-no-skrollr />
+
+	<link rel="stylesheet" type="text/css" href="style.css" />
+
+	<style>
+	#foo {
+		-skrollr-animation-name: name1;
+	}
+
+	@-skrollr-keyframes name1 {
+		bottom-top {
+			left:100%;
+		}
+
+		top-bottom {
+			left:0%;
+		}
+	}
+	</style>
+</head>
+<body class="notransition">
+	<div id="foo"></div>
+	<div id="bar"></div>
+
+	<div id="qunit"></div>
+
+	<script src="qunit.js" type="text/javascript"></script>
+	<script src="jquery.js" type="text/javascript"></script>
+	<script src="../src/skrollr-stylesheets.js" type="text/javascript"></script>
+	<script src="tests.js" type="text/javascript"></script>
+</body>
+</html>
