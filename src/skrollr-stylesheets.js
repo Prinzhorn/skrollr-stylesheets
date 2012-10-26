@@ -18,9 +18,8 @@
 	//http://regexpal.com/ saves your ass with stuff like this.
 	var rxKeyframes = /\s*\{\s*((?:[^{]+\{[^}]*\}\s*)+?)\s*\}/g;
 
-	/*
-
-	*/
+	//Gets a single keyframe and the properties inside.
+	var rxSingleKeyframe = /([\w\-]+)\s*\{([^}]+)\}/g;
 
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
@@ -45,24 +44,29 @@
 		rxAnimation.lastIndex = 0;
 
 		var animation;
-		var keyframes;
+		var rawKeyframes;
+		var keyframe;
+		var curAnimation;
 
 		while((animation = rxAnimation.exec(input)) !== null) {
 			//Grab the keyframes inside this animation.
 			rxKeyframes.lastIndex = rxAnimation.lastIndex;
-			keyframes = rxKeyframes.exec(input);
-			alert(animation[1]);
-			alert(keyframes[1]);
+			rawKeyframes = rxKeyframes.exec(input);
+
+			//Grab the single keyframes with their CSS properties.
+			rxSingleKeyframe.lastIndex = 0;
+
+			//Save the animation in an object using it's name as key.
+			curAnimation = animations[animation[1]] = {};
+
+			while((keyframe = rxSingleKeyframe.exec(rawKeyframes[1])) !== null) {
+				//Put all keyframes inside the animation using the keyframe (like botttom-top, or 100) as key
+				//and the properties as value (just the raw string, newline stripped).
+				curAnimation[keyframe[1]] = keyframe[2].replace(/[\n\r\t]/g, '');
+			}
 		}
 
-		/*
-		Search for all occurrences of "@-skrollr-keyframes" and grab the animation name
-		Use a regex to extract the keyframes starting at the open curly brace after "@-skrollr-keyframes"
-		Concat all rules per keyframe (the data-attributes get this as value)
-		Put the animations inside an object using their name as key for later lookup
-		Put the keyframe inside the animation object using the keyframes as name
-		*/
-
+		console.log(animations);
 	};
 
 	//Finds usage of animations and puts the selectors into "selectors".

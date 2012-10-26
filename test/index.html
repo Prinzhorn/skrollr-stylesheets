@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="no-skrollr">
+<html>
 <head>
 	<meta charset="utf-8" />
 
-	<title>skrollr test suite</title>
+	<title>skrollr-stylesheets test suite</title>
 
 	<link rel="stylesheet" type="text/css" href="qunit.css" data-no-skrollr />
 
@@ -14,13 +14,31 @@
 		-skrollr-animation-name: name1;
 	}
 
+	#bar {
+		-skrollr-animation-name: name2;
+	}
+
 	@-skrollr-keyframes name1 {
 		bottom-top {
 			left:100%;
+			top:0%;
 		}
 
 		top-bottom {
 			left:0%;
+			top:50%;
+		}
+	}
+
+	@-skrollr-keyframes name2 {
+		top {
+			margin:100px;
+			color:rgb(0,0,0);
+		}
+
+		bottom {
+			margin:300px;
+			color:rgb(0,255,0);
 		}
 	}
 	</style>
