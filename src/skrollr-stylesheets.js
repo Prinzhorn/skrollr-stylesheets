@@ -11,19 +11,26 @@
 	var animations = {};
 	var selectors = [];
 
-	var rxAnimation = /@-skrollr-keyframes\s+(\w+)/;
+	//Finds the declaration of an animation block.
+	var rxAnimation = /@-skrollr-keyframes\s+(\w+)/g;
+
+	//Finds the block of keyframes inside an animation block.
+	//http://regexpal.com/ saves your ass with stuff like this.
+	var rxKeyframes = /\s*\{\s*((?:[^{]+\{[^}]*\}\s*)+?)\s*\}/g;
+
+	/*
+
+	*/
 
 	var fetchRemote = function(url) {
-		var xhr;
-
-		xhr = new XMLHttpRequest();
+		var xhr = new XMLHttpRequest();
 
 		try {
 			xhr.open('GET', url, false);
 			xhr.send(null);
 		} catch (e) {
 			//Fallback to XDomainRequest if available
-			if (window.XDomainRequest !== undefined) {
+			if (window.XDomainRequest) {
 				xhr = new XDomainRequest();
 				xhr.open("GET", url, false);
 				xhr.send(null);
@@ -37,19 +44,24 @@
 	var parseDeclarations = function(input) {
 		rxAnimation.lastIndex = 0;
 
-		var match;
+		var animation;
+		var keyframes;
 
-		while((match = rxAnimation.exec(input)) !== null) {
-			alert(match);
+		while((animation = rxAnimation.exec(input)) !== null) {
+			//Grab the keyframes inside this animation.
+			rxKeyframes.lastIndex = rxAnimation.lastIndex;
+			keyframes = rxKeyframes.exec(input);
+			alert(animation[1]);
+			alert(keyframes[1]);
 		}
-		alert('lulz');
-	/*
-    Search for all occurrences of "@-skrollr-keyframes" and grab the animation name
-    Use a regex to extract the keyframes starting at the open curly brace after "@-skrollr-keyframes"
-    Concat all rules per keyframe (the data-attributes get this as value)
-    Put the animations inside an object using their name as key for later lookup
-    Put the keyframe inside the animation object using the keyframes as name
-    */
+
+		/*
+		Search for all occurrences of "@-skrollr-keyframes" and grab the animation name
+		Use a regex to extract the keyframes starting at the open curly brace after "@-skrollr-keyframes"
+		Concat all rules per keyframe (the data-attributes get this as value)
+		Put the animations inside an object using their name as key for later lookup
+		Put the keyframe inside the animation object using the keyframes as name
+		*/
 
 	};
 
@@ -68,7 +80,7 @@
 		var sheet = stylesheets[stylesheetIndex];
 		var node = sheet.ownerNode;
 
-		//Ignore alternate stylesheets or those with explicit attribute.
+		//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
 		if((node.tagName === 'LINK' && node.rel !== 'stylesheet') || node.hasAttribute('data-no-skrollr')) {
 			continue;
 		}
