@@ -1,0 +1,9 @@
+.foo {}
+
+@-skrollr-keyframes external1 {
+	100 {
+		transform :  rotate(100deg);
+	}
+}
+
+.bar {}

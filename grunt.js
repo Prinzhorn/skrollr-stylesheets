@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 		},
 		qunit: {
 			//Test file protocol and http
-			index: ['test/index.html', 'http://localhost:8081/index.html']
+			index: ['test/index.html']
 		},
 		min: {
 			core: {
