@@ -40,6 +40,52 @@
 		return xhr.responseText;
 	};
 
+	//"main"
+	var kickstart = function() {
+		//Iterate over all stylesheets, embedded and remote.
+		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
+			var sheet = stylesheets[stylesheetIndex];
+			var node = sheet.ownerNode;
+
+			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
+			if((node.tagName === 'LINK' && node.rel !== 'stylesheet') || node.hasAttribute('data-no-skrollr')) {
+				continue;
+			}
+
+			//Embedded stylesheet, grab the node content.
+			if(sheet.href === null) {
+				content = node.firstChild.textContent || node.firstChild.innerText;
+			}
+			//Remote stylesheet, fetch it (synchrnonous).
+			else {
+				content = fetchRemote(node.href);
+			}
+
+			if(content) {
+				contents.push(content);
+			}
+		}
+
+		//We take the stylesheets in reverse order.
+		//This is needed to ensure correct order of stylesheets and inline styles.
+		contents.reverse();
+
+		var animations;
+		var selectors;
+
+		//Now parse all stylesheets.
+		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
+			content = contents[contentIndex];
+
+			animations = parseDeclarations(content);
+
+			selectors = parseUsage(content);
+		}
+
+		//Apply the keyframes to the elements.
+		applyKeyframes(animations, selectors);
+	};
+
 	//Finds animation declarations and puts them into "animations".
 	var parseDeclarations = function(input) {
 		rxAnimation.lastIndex = 0;
@@ -108,6 +154,9 @@
 		var animationName;
 		var keyframeName;
 		var elementIndex;
+		var attributeName;
+		var attributeValue;
+		var curElement;
 
 		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
 			elements = document.querySelectorAll(selectors[selectorIndex][0]);
@@ -120,51 +169,21 @@
 
 			for(keyframeName in keyframes) {
 				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-					elements[elementIndex].setAttribute('data-' + keyframeName, keyframes[keyframeName]);
+					curElement = elements[elementIndex];
+					attributeName = 'data-' + keyframeName;
+					attributeValue = keyframes[keyframeName];
+
+					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
+					//The inline one may actually be the result of the keyframes from another stylesheet.
+					//Since we reversed the order of the stylesheets, everything comes together correctly here.
+					if(curElement.hasAttribute(attributeName)) {
+						attributeValue = curElement.getAttribute(attributeName) + attributeValue;
+					}
+
+					elements[elementIndex].setAttribute(attributeName, attributeValue);
 				}
 			}
 		}
-	};
-
-	var kickstart = function() {
-		//Iterate over all stylesheets, embedded and remote.
-		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
-			var sheet = stylesheets[stylesheetIndex];
-			var node = sheet.ownerNode;
-
-			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
-			if((node.tagName === 'LINK' && node.rel !== 'stylesheet') || node.hasAttribute('data-no-skrollr')) {
-				continue;
-			}
-
-			//Embedded stylesheet, grab the node content.
-			if(sheet.href === null) {
-				content = node.firstChild.textContent || node.firstChild.innerText;
-			}
-			//Remote stylesheet, fetch it (synchrnonous).
-			else {
-				content = fetchRemote(node.href);
-			}
-
-			if(content) {
-				contents.push(content);
-			}
-		}
-
-		var animations;
-		var selectors;
-
-		//Now parse all stylesheets.
-		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
-			content = contents[contentIndex];
-
-			animations = parseDeclarations(content);
-
-			selectors = parseUsage(content);
-		}
-
-		//Apply the keyframes to the elements.
-		applyKeyframes(animations, selectors);
 	};
 
 	kickstart();

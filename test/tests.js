@@ -1,6 +1,3 @@
-$(window).on('load', function() {
-
-
 test('All attributes are there', function() {
 	var foo = $('#foo');
 	var bar = $('#bar');
@@ -8,6 +5,3 @@ test('All attributes are there', function() {
 	equal(foo.attr('data-bottom-top'), 'left:100%;top:0%;', 'bottom-top');
 	equal(foo.attr('data-top-bottom'), 'left:0%;top:50%;', 'top-bottom');
 });
-
-
-});//DOM ready
