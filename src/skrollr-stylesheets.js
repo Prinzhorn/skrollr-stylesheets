@@ -25,6 +25,11 @@
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
 
+		/*
+		 * Yes, these are SYNCHRONOUS requests.
+		 * Simply because skrollr stylesheets should run while the page is loaded.
+		 * Get over it.
+		 */
 		try {
 			xhr.open('GET', url, false);
 			xhr.send(null);
@@ -70,27 +75,26 @@
 		//This is needed to ensure correct order of stylesheets and inline styles.
 		contents.reverse();
 
-		var animations;
-		var selectors;
+		var animations = {};
+		var selectors = [];
 
 		//Now parse all stylesheets.
 		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
 			content = contents[contentIndex];
 
-			animations = parseDeclarations(content);
+			parseDeclarations(content, animations);
 
-			selectors = parseUsage(content);
+			parseUsage(content, selectors);
 		}
 
 		//Apply the keyframes to the elements.
 		applyKeyframes(animations, selectors);
 	};
 
-	//Finds animation declarations and puts them into "animations".
-	var parseDeclarations = function(input) {
+	//Finds animation declarations and puts them into the output map.
+	var parseDeclarations = function(input, output) {
 		rxAnimation.lastIndex = 0;
 
-		var ret = {};
 		var animation;
 		var rawKeyframes;
 		var keyframe;
@@ -105,7 +109,7 @@
 			rxSingleKeyframe.lastIndex = 0;
 
 			//Save the animation in an object using it's name as key.
-			curAnimation = ret[animation[1]] = {};
+			curAnimation = output[animation[1]] = {};
 
 			while((keyframe = rxSingleKeyframe.exec(rawKeyframes[1])) !== null) {
 				//Put all keyframes inside the animation using the keyframe (like botttom-top, or 100) as key
@@ -113,15 +117,12 @@
 				curAnimation[keyframe[1]] = keyframe[2].replace(/[\n\r\t]/g, '');
 			}
 		}
-
-		return ret;
 	};
 
-	//Finds usage of animations and puts the selectors into "selectors".
-	var parseUsage = function(input) {
+	//Finds usage of animations and puts the selectors into the output array.
+	var parseUsage = function(input, output) {
 		rxAnimationUsage.lastIndex = 0;
 
-		var ret = [];
 		var match;
 		var curlyIndex;
 		var begin;
@@ -141,10 +142,8 @@
 			while(begin-- && input.charAt(begin - 1) !== '}');
 
 			//Associate this selector with the animation name.
-			ret.push([input.substring(begin, end).replace(/[\n\r\t]/g, ''), match[1]]);
+			output.push([input.substring(begin, end).replace(/[\n\r\t]/g, ''), match[1]]);
 		}
-
-		return ret;
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
@@ -177,7 +176,7 @@
 					//The inline one may actually be the result of the keyframes from another stylesheet.
 					//Since we reversed the order of the stylesheets, everything comes together correctly here.
 					if(curElement.hasAttribute(attributeName)) {
-						attributeValue = curElement.getAttribute(attributeName) + attributeValue;
+						attributeValue += curElement.getAttribute(attributeName);
 					}
 
 					elements[elementIndex].setAttribute(attributeName, attributeValue);

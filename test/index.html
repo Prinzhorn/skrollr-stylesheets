@@ -8,17 +8,22 @@
 	<link rel="stylesheet" type="text/css" href="qunit.css" data-no-skrollr />
 
 	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="stylesheet" type="text/css" href="style-ignore.css" data-no-skrollr />
 
 	<style>
-	#foo {
-		-skrollr-animation-name: name1;
+	#simple1 {
+		-skrollr-animation-name: test1;
 	}
 
-	#bar {
-		-skrollr-animation-name: name2;
+	#simple2 {
+		-skrollr-animation-name: test2;
 	}
 
-	@-skrollr-keyframes name1 {
+	html body > div.complex {
+		-skrollr-animation-name: test3;
+	}
+
+	@-skrollr-keyframes test1 {
 		bottom-top {
 			left:100%;
 			top:0%;
@@ -26,26 +31,69 @@
 
 		top-bottom {
 			left:0%;
-			top:50%;
+			top:100%;
 		}
 	}
 
-	@-skrollr-keyframes name2 {
+	@-skrollr-keyframes test2 {
 		top {
-			margin:100px;
+			margin:0px;
 			color:rgb(0,0,0);
 		}
 
 		bottom {
-			margin:300px;
-			color:rgb(0,255,0);
+			margin:100px;
+			color:rgb(255,255,255);
 		}
+	}
+
+	@-skrollr-keyframes test3 {
+		0 {
+			left:0px;
+		}
+		100 {
+			left:100px;
+		}
+	}
+
+	#precedence {
+		-skrollr-animation-name:precedence2;
+	}
+
+	@-skrollr-keyframes precedence2 {
+		0 {
+			top:0px;
+		}
+
+		/*100 should be interhited from style.css*/
+
+		200 {
+			top:200px;
+		}
+	}
+
+	#inline {
+		-skrollr-animation-name:inline;
+	}
+
+	@-skrollr-keyframes inline		{
+		0{top:1337px;}
 	}
 	</style>
 </head>
 <body class="notransition">
-	<div id="foo"></div>
-	<div id="bar"></div>
+	<div id="simple1"></div>
+	<div id="simple2"></div>
+
+	<div id="complex1" class="complex"></div>
+
+	<div id="external"></div>
+
+	<div id="ignore"></div>
+
+	<div id="precedence"></div>
+
+	<div id="inline" data-0="top:0px;"></div>
 
 	<div id="qunit"></div>
 

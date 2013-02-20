@@ -1,4 +1,4 @@
-.foo {}
+.trash1 {}
 
 @-skrollr-keyframes external1 {
 	100 {
@@ -6,4 +6,51 @@
 	}
 }
 
-.bar {}
+.trash2 {
+	color:red;
+}
+
+#ignore {
+	-skrollr-animation-name:ignore1;
+}
+
+@-skrollr-keyframes ignore1 {
+	0 {
+		left:0px;
+	}
+
+	100 {
+		left:100px;
+	}
+}
+
+#external {
+	position:absolute;
+	left:0;
+	-skrollr-animation-name:external1;
+}
+
+@-skrollr-keyframes external1 {
+	0  {
+		bottom:0px;
+	}
+
+	100
+	{
+		bottom:100px;
+	}
+}
+
+#precedence {
+	-skrollr-animation-name:precedence1;
+}
+
+@-skrollr-keyframes precedence1 {
+	0 {
+		top:1337px;
+	}
+
+	100 {
+		top:100px;
+	}
+}

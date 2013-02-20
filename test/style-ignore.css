@@ -1,0 +1,13 @@
+#ignore {
+	-skrollr-animation-name:ignore1;
+}
+
+@-skrollr-keyframes ignore1 {
+	0 {
+		left:1337px;
+	}
+
+	100 {
+		left:1337px;
+	}
+}
