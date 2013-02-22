@@ -92,7 +92,7 @@ $about_section_end: $about_section_begin + $about_section_duration;
 }
 ```
 
-\*_mind blown_\*
+_\*mind blown\*_
 
 And of course you can use all the things you already love about SASS as well.
 
