@@ -54,6 +54,7 @@ results in this HTML
 
 You can use any CSS selector you want because we are using `document.querySelectorAll`. And you can even have multiple declarations affect the same element. The lower they appear inside the stylesheet(s), the higher their priority gets.
 
+
 The script
 -----
 
@@ -61,10 +62,40 @@ In order to use skrollr-stylesheets just put `dist/skrollr-stylesheets.min.js` i
 
 skrollr-stylesheets doesn't expose or expect any globals (well, except for `window` and `document`, duh). You don't need to do anything but include the script.
 
+
 Prevent parsing
 -----
 
 If you want to ignore certain CSS files or help skrollr-stylesheets decide which stylesheets to ignore, add an empty `data-no-skrollr` attribute to the `<style>` or `<link>` element and skrollr-stylesheets will ignore the stylesheet.
+
+
+SASS
+-----
+
+The above is already pretty awesome, but it gets even better. If you know skrollr, you probably heard about the _contants_ feature. Let's admit it: it does it's job, but it's ugly.
+
+(SASS)[http://sass-lang.com/] to the rescue! Using SASS variables and interpolation, things can now look like this:
+
+```css
+$about_section_begin: 0;
+$about_section_duration: 2000;
+$about_section_end: $about_section_begin + $about_section_duration;
+
+@-skrollr-keyframes animation1 {
+	#{$about_section_begin} {
+		left:100%;
+	}
+
+	#{$about_section_end} {
+		left:0%;
+	}
+}
+```
+
+\*_mind blown_\*
+
+And of course you can use all the things you already love about SASS as well.
+
 
 Limitations
 =====
