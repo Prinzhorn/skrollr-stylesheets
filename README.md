@@ -69,12 +69,12 @@ Prevent parsing
 If you want to ignore certain CSS files or help skrollr-stylesheets decide which stylesheets to ignore, add an empty `data-no-skrollr` attribute to the `<style>` or `<link>` element and skrollr-stylesheets will ignore the stylesheet.
 
 
-SASS
+Sass
 -----
 
 The above is already pretty awesome, but it gets even better. If you know skrollr, you probably heard about the _constants_ feature. Let's admit it: it does it's job, but it's ugly.
 
-[SASS](http://sass-lang.com/) to the rescue! Using SASS variables and interpolation, things can now look like this:
+[Sass](http://sass-lang.com/) to the rescue! Using Sass variables and interpolation, things can now look like this:
 
 ```scss
 $about_section_begin: 0;
@@ -94,7 +94,7 @@ $about_section_end: $about_section_begin + $about_section_duration;
 
 _\*mind blown\*_
 
-And of course you can use all the things you already love about SASS as well.
+And of course you can use all the things you already love about Sass as well.
 
 
 Limitations
