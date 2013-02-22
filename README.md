@@ -74,7 +74,7 @@ SASS
 
 The above is already pretty awesome, but it gets even better. If you know skrollr, you probably heard about the _constants_ feature. Let's admit it: it does it's job, but it's ugly.
 
-(SASS)[http://sass-lang.com/] to the rescue! Using SASS variables and interpolation, things can now look like this:
+[SASS](http://sass-lang.com/) to the rescue! Using SASS variables and interpolation, things can now look like this:
 
 ```scss
 $about_section_begin: 0;
