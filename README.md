@@ -76,7 +76,7 @@ The above is already pretty awesome, but it gets even better. If you know skroll
 
 (SASS)[http://sass-lang.com/] to the rescue! Using SASS variables and interpolation, things can now look like this:
 
-```css
+```scss
 $about_section_begin: 0;
 $about_section_duration: 2000;
 $about_section_end: $about_section_begin + $about_section_duration;
