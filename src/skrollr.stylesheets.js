@@ -55,7 +55,7 @@
 			var node = sheet.ownerNode || sheet.owningElement;
 
 			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
-			if((node.tagName === 'LINK' && node.rel.indexOf('alternate') !== -1) || node.hasAttribute('data-no-skrollr')) {
+			if((node.tagName === 'LINK' && node.rel.indexOf('alternate') !== -1) || node.getAttribute('data-no-skrollr') !== null) {
 				continue;
 			}
 
