@@ -5,10 +5,10 @@
 
 	<title>skrollr-stylesheets test suite</title>
 
-	<link rel="stylesheet" type="text/css" href="qunit.css" data-no-skrollr />
+	<link rel="stylesheet" type="text/css" href="qunit.css" />
 
-	<link rel="stylesheet" type="text/css" href="style.css" />
-	<link rel="stylesheet" type="text/css" href="style-ignore.css" data-no-skrollr />
+	<link rel="stylesheet" type="text/css" href="style.css" data-skrollr-stylesheet />
+	<link rel="stylesheet" type="text/css" href="style-ignore.css" />
 
 	<style>
 	#simple1 {
@@ -96,6 +96,8 @@
 	<div id="inline" data-0="top:0px;"></div>
 
 	<div id="qunit"></div>
+
+	<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js#startOpened"></script>
 
 	<script src="qunit.js" type="text/javascript"></script>
 	<script src="jquery.js" type="text/javascript"></script>

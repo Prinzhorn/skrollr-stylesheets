@@ -7,7 +7,6 @@
 (function(window, document, undefined) {
 	'use strict';
 
-	var stylesheets = document.styleSheets;
 	var content;
 	var contents = [];
 
@@ -48,24 +47,21 @@
 	};
 
 	//"main"
-	var kickstart = function() {
+	var kickstart = function(stylesheets) {
 		//Iterate over all stylesheets, embedded and remote.
 		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
 			var sheet = stylesheets[stylesheetIndex];
-			var node = sheet.ownerNode || sheet.owningElement;
 
-			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
-			if((node.tagName === 'LINK' && node.rel.indexOf('alternate') !== -1) || node.getAttribute('data-no-skrollr') !== null) {
-				continue;
-			}
+			if(sheet.tagName === 'LINK') {
+				if(sheet.getAttribute('data-skrollr-stylesheet') === null) {
+					continue;
+				}
 
-			//Embedded stylesheet, grab the node content.
-			if(node.tagName === 'STYLE') {
-				content = node.textContent || node.innerText || sheet.cssText;
-			}
-			//Remote stylesheet, fetch it (synchrnonous).
-			else {
-				content = fetchRemote(node.href);
+				//Remote stylesheet, fetch it (synchrnonous).
+				content = fetchRemote(sheet.href);
+			} else {
+				//Embedded stylesheet, grab the node content.
+				content = sheet.textContent || sheet.innerText || sheet.innerHTML;
 			}
 
 			if(content) {
@@ -185,5 +181,5 @@
 		}
 	};
 
-	kickstart();
+	kickstart(document.querySelectorAll('link, style'));
 }(window, document));

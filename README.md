@@ -1,4 +1,4 @@
-skrollr-stylesheets (v 0.0.1, yes, it's _that_ hot)
+skrollr-stylesheets (v 0.0.2, yes, it's _that_ hot)
 ===================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
@@ -8,7 +8,7 @@ See https://github.com/Prinzhorn/skrollr for infos on skrollr.
 Documentation
 =====
 
-This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses all your stylesheets (`<link>` and `<style>` elements) and adds the information to the document as skrollr compatible data-attributes.
+This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses your stylesheets (`link` and `style` elements) and adds the information to the document as skrollr compatible data-attributes.
 
 When I say "parsing" I mean it's using regular expressions. Thus you should avoid doing funky stuff inside your CSS files (actually, comments at the wrong place could break the current version). Just put all skrollr related things in one file and keep it clean.
 
@@ -20,7 +20,7 @@ This HTML
 <div id="foo"></div>
 ```
 
-together with this CSS (inside any `<style>` or `<link>`)
+together with this CSS (inside any `style` or `link`)
 
 ```css
 #foo {
@@ -63,10 +63,16 @@ In order to use skrollr-stylesheets just put `dist/skrollr.stylesheets.min.js` i
 skrollr-stylesheets doesn't expose or expect any globals (well, except for `window` and `document`, duh). You don't need to do anything but include the script.
 
 
-Prevent parsing
+External stylesheets
 -----
 
-If you want to ignore certain CSS files or help skrollr-stylesheets decide which stylesheets to ignore, add an empty `data-no-skrollr` attribute to the `<style>` or `<link>` element and skrollr-stylesheets will ignore the stylesheet.
+If you want skrollr-stylesheets to parse an external stylesheet (those using a `link` element), add an empty `data-skrollr-stylesheet` attribute to it.
+
+Example
+
+```html
+<link rel="stylesheet" type="text/css" href="style.css" data-skrollr-stylesheet />
+```
 
 
 Sass
@@ -111,6 +117,7 @@ Changelog
 -----
 
 * Fixed several issues with IE.
+* **breaking**: The logic of `data-no-skrollr` has been inversed. The attribute has been removed. Instead add `data-skrollr-stylesheet` to explicitly parse this external stylesheet.
 
 0.0.1
 -----
