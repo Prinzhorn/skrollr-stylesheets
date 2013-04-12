@@ -1,1 +1,0 @@
-/*! skrollr-stylesheets v0.0.1 https://github.com/Prinzhorn/skrollr-stylesheets | free to use under terms of MIT license */

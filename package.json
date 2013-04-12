@@ -1,0 +1,40 @@
+{
+  "name": "skrollr-stylesheets",
+  "title": "skrollr-stylesheets",
+  "description": "Parses skrollr compatible keyframe rules from stylesheets and applies them to elements as data attributes.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Prinzhorn/skrollr",
+  "author": {
+    "name": "Alexander Prinzhorn",
+    "email": "alexander@prinzhorn.it",
+    "url": "http://www.prinzhorn.it/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Prinzhorn/skrollr-stylesheets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Prinzhorn/skrollr-stylesheets/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/Prinzhorn/skrollr-stylesheets/blob/master/LICENSE.txt"
+    }
+  ],
+  "main": "dist/skrollr-stylesheets.min.js",
+  "engines": {
+    "node": ">=0.8"
+  },
+  "scripts": {
+    "test": "grunt travis --verbose"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.7",
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-jshint": "~0.3.0",
+    "grunt-contrib-qunit": "~0.2.0"
+  },
+  "keywords": []
+}

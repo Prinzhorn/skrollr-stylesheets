@@ -5,6 +5,8 @@
  * Doesn't expose any globals.
  */
 (function(window, document, undefined) {
+	'use strict';
+
 	var stylesheets = document.styleSheets;
 	var content;
 	var contents = [];
@@ -37,7 +39,7 @@
 			//Fallback to XDomainRequest if available
 			if (window.XDomainRequest) {
 				xhr = new XDomainRequest();
-				xhr.open("GET", url, false);
+				xhr.open('GET', url, false);
 				xhr.send(null);
 			}
 		}
@@ -58,7 +60,7 @@
 			}
 
 			//Embedded stylesheet, grab the node content.
-			if(sheet.href === null) {
+			if(node.tagName === 'STYLE') {
 				content = node.firstChild.textContent || node.firstChild.innerText;
 			}
 			//Remote stylesheet, fetch it (synchrnonous).
@@ -124,7 +126,6 @@
 		rxAnimationUsage.lastIndex = 0;
 
 		var match;
-		var curlyIndex;
 		var begin;
 		var end;
 
@@ -134,12 +135,12 @@
 
 			//First find the curly bracket that opens this block.
 			end = rxAnimationUsage.lastIndex;
-			while(end-- && input.charAt(end) !== '{');
+			while(end-- && input.charAt(end) !== '{') {}
 
 			//Now walk farther backwards until we grabbed the whole selector.
 			//This either ends at beginning of string or at end of next block.
 			begin = end;
-			while(begin-- && input.charAt(begin - 1) !== '}');
+			while(begin-- && input.charAt(begin - 1) !== '}') {}
 
 			//Associate this selector with the animation name.
 			output.push([input.substring(begin, end).replace(/[\n\r\t]/g, ''), match[1]]);
@@ -150,7 +151,6 @@
 	var applyKeyframes = function(animations, selectors) {
 		var elements;
 		var keyframes;
-		var animationName;
 		var keyframeName;
 		var elementIndex;
 		var attributeName;
