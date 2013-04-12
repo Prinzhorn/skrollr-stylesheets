@@ -52,7 +52,7 @@
 		//Iterate over all stylesheets, embedded and remote.
 		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
 			var sheet = stylesheets[stylesheetIndex];
-			var node = sheet.ownerNode;
+			var node = sheet.ownerNode || sheet.owningElement;
 
 			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
 			if((node.tagName === 'LINK' && node.rel !== 'stylesheet') || node.hasAttribute('data-no-skrollr')) {
