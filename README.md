@@ -107,6 +107,11 @@ skrollr-stylesheets tries to mimic the way normal CSS works in terms of inherita
 Changelog
 =====
 
+0.0.2
+-----
+
+* Fixed several issues with IE.
+
 0.0.1
 -----
 

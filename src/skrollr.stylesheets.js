@@ -55,13 +55,13 @@
 			var node = sheet.ownerNode || sheet.owningElement;
 
 			//Ignore alternate stylesheets or those who should explicitly be ignored using data-no-skrollr.
-			if((node.tagName === 'LINK' && node.rel !== 'stylesheet') || node.hasAttribute('data-no-skrollr')) {
+			if((node.tagName === 'LINK' && node.rel.indexOf('alternate') !== -1) || node.hasAttribute('data-no-skrollr')) {
 				continue;
 			}
 
 			//Embedded stylesheet, grab the node content.
 			if(node.tagName === 'STYLE') {
-				content = node.firstChild.textContent || node.firstChild.innerText;
+				content = node.textContent || node.innerText || sheet.cssText;
 			}
 			//Remote stylesheet, fetch it (synchrnonous).
 			else {
