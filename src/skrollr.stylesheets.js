@@ -58,9 +58,9 @@
 				}
 
 				//if matchMedia available test media attr
-				if(matchMedia) {
+				if(window.matchMedia) {
 					var media = sheet.getAttribute('media');
-					if(media && !matchMedia(media).matches) {
+					if(media && !window.matchMedia(media).matches) {
 						continue;
 					}
 				}
