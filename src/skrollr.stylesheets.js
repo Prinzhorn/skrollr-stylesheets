@@ -57,6 +57,14 @@
 					continue;
 				}
 
+				//if matchMedia available test media attr
+				if(matchMedia) {
+					var media = sheet.getAttribute('media');
+					if(!matchMedia(media).matches) {
+						continue;
+					}
+				}
+
 				//Remote stylesheet, fetch it (synchrnonous).
 				content = fetchRemote(sheet.href);
 			} else {
