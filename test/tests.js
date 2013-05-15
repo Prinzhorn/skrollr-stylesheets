@@ -43,3 +43,10 @@ test('Inline rules them all', function() {
 
 	equal(inline.attr('data-0'), 'top:1337px;top:0px;', '#inline 0');
 });
+
+test('Stylesheet with media attribute', function() {
+	var media = $('#media');
+
+	equal(media.attr('data-0'), 'left:100px;', '#media 0');
+	equal(media.attr('data-100'), 'left:200px;', '#media 100');
+});
