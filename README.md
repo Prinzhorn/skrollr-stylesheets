@@ -75,6 +75,17 @@ Example
 ```
 
 
+You can also specifiy a media attribute that will be considered. 
+
+Example
+
+```html
+<link rel="stylesheet" type="text/css" href="style.css" media="only screen and (min-width: 1050px)" data-skrollr-stylesheet />
+```
+
+This feature relies on [window.matchMedia](https://developer.mozilla.org/en-US/docs/DOM/window.matchMedia).
+There is a [matchMedia polyfill](https://github.com/paulirish/matchMedia.js) available that can be used with older browsers. Look at [http://caniuse.com/#search=matchmedia](http://caniuse.com/#search=matchmedia) for browser compatibility.
+
 Sass
 -----
 
