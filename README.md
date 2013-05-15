@@ -1,4 +1,4 @@
-skrollr-stylesheets (v 0.0.2, yes, it's _that_ hot)
+skrollr-stylesheets (v 0.0.3, yes, it's _that_ hot)
 ===================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
@@ -74,17 +74,20 @@ Example
 <link rel="stylesheet" type="text/css" href="style.css" data-skrollr-stylesheet />
 ```
 
+Media queries
+-----
 
-You can also specifiy a media attribute that will be considered. 
+You **cannot** use media queries inside your stylesheets. Parsing those would add another level of complexity to the code. Further more this would not fit the current philosophy of skrollr-stylesheets, which is to parse and apply the keyframes once on page load and then do nothing. Media queries would need to be evaluated at each `resize` and `orientationchange`.
+
+But wait! You **can** use the `media` attribute on external stylesheets. But bare in mind that they are only evaluated once at page load.
 
 Example
 
 ```html
-<link rel="stylesheet" type="text/css" href="style.css" media="only screen and (min-width: 1050px)" data-skrollr-stylesheet />
+<link rel="stylesheet" type="text/css" href="style-large.css" media="only screen and (min-width: 1050px)" data-skrollr-stylesheet />
 ```
 
-This feature relies on [window.matchMedia](https://developer.mozilla.org/en-US/docs/DOM/window.matchMedia).
-There is a [matchMedia polyfill](https://github.com/paulirish/matchMedia.js) available that can be used with older browsers. Look at [http://caniuse.com/#search=matchmedia](http://caniuse.com/#search=matchmedia) for browser compatibility.
+This feature relies on [window.matchMedia](https://developer.mozilla.org/en-US/docs/DOM/window.matchMedia). There is a [matchMedia polyfill](https://github.com/paulirish/matchMedia.js) available that can be used with older browsers. Look at [http://caniuse.com/#search=matchmedia](http://caniuse.com/#search=matchmedia) for browser compatibility.
 
 Sass
 -----
@@ -117,12 +120,17 @@ And of course you can use all the things you already love about Sass as well.
 Limitations
 =====
 
-skrollr-stylesheets does not react to changes in the document. The stylesheets are parsed once and then applied. You can't add a class to an element and it will get updated.
+skrollr-stylesheets does not react to changes in the document. The stylesheets are parsed once and then applied. You can't add a class to an element and expect the keyframes to get updated.
 
 skrollr-stylesheets tries to mimic the way normal CSS works in terms of inheritance and order of precedence. Stylesheets which appear lower in the document will have higher precedence, and inline keyframes will have precedence over everything else. That means if you declare the same keyframe with same properties (probably different values) in multiple places, they overwrite each other, just as normal CSS does. **But skrollr-stylesheets is not able to detect which selector has a higher specificity. It only operates on element-level. Thus only the order of rules counts, not the specificity of the selector.**
 
 Changelog
 =====
+
+0.0.3 (2013-05-15)
+-----
+
+* Added support for `media` attribute on external stylesheets.
 
 0.0.2 (2013-04-12)
 -----

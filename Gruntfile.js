@@ -19,7 +19,8 @@ module.exports = function(grunt) {
 					document: true,
 					navigator: true,
 					XMLHttpRequest: true,
-					XDomainRequest: true
+					XDomainRequest: true,
+					matchMedia: true
 				}
 			},
 			all: ['src/**/*.js']
