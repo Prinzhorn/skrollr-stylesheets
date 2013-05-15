@@ -8,7 +8,7 @@ See https://github.com/Prinzhorn/skrollr for infos on skrollr.
 Documentation
 =====
 
-This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses your stylesheets (`link` and `style` elements) and adds the information to the document as skrollr compatible data-attributes.
+This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses your stylesheets (`link` and `style` elements) and adds the information to the document as skrollr compatible data-attributes. After skrollr-stylesheets did it's job, you can use skrollr they way you're used to, just as if you had put the data-attributes on the elements manually.
 
 When I say "parsing" I mean it's using regular expressions. Thus you should avoid doing funky stuff inside your CSS files (actually, comments at the wrong place could break the current version). Just put all skrollr related things in one file and keep it clean.
 
