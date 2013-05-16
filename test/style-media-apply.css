@@ -1,0 +1,13 @@
+#media {
+	-skrollr-animation-name:responsive2;
+}
+
+@-skrollr-keyframes responsive2 {
+	0 {
+		left:100px;
+	}
+
+	100 {
+		left:200px;
+	}
+}
