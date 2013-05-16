@@ -2,7 +2,7 @@
   "name": "skrollr-stylesheets",
   "title": "skrollr-stylesheets",
   "description": "Parses skrollr compatible keyframe rules from stylesheets and applies them to elements as data attributes.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/Prinzhorn/skrollr",
   "author": {
     "name": "Alexander Prinzhorn",
