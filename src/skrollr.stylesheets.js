@@ -11,7 +11,7 @@
 	var contents = [];
 
 	//Finds the declaration of an animation block.
-	var rxAnimation = /@-skrollr-keyframes\s+(\w+)/g;
+	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
 
 	//Finds the block of keyframes inside an animation block.
 	//http://regexpal.com/ saves your ass with stuff like this.
@@ -21,7 +21,7 @@
 	var rxSingleKeyframe = /([\w\-]+)\s*\{([^}]+)\}/g;
 
 	//Finds usages of the animation.
-	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*(\w+)/g;
+	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*([\w-]+)/g;
 
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
