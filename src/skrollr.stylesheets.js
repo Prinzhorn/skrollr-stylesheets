@@ -10,6 +10,9 @@
 	var content;
 	var contents = [];
 
+	//Finds all Comments in CSS
+	var rxComments = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
+
 	//Finds the declaration of an animation block.
 	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
 
@@ -89,6 +92,8 @@
 		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
 			content = contents[contentIndex];
 
+			content = stripComments(content);
+
 			parseDeclarations(content, animations);
 
 			parseUsage(content, selectors);
@@ -96,6 +101,13 @@
 
 		//Apply the keyframes to the elements.
 		applyKeyframes(animations, selectors);
+	};
+
+	//Find Comments in Style and removes them.
+	var stripComments = function(input) {
+
+		return input.replace(rxComments,'');
+
 	};
 
 	//Finds animation declarations and puts them into the output map.
