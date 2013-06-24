@@ -50,3 +50,38 @@ test('Stylesheet with media attribute', function() {
 	equal(media.attr('data-0'), 'left:100px;', '#media 0');
 	equal(media.attr('data-100'), 'left:200px;', '#media 100');
 });
+
+test('External stylesheets with Wrapped Comment inside Selector', function() {
+	var comment = $('#commentInsideSelectorWrapped');
+
+	equal(comment.attr('data-0'), undefined, '#commentInsideWrapped 0');
+	equal(comment.attr('data-100'), undefined, '#commentInsideWrapped 100');
+});
+
+test('External stylesheets with Line Comment inside Selector', function() {
+	var comment = $('#commentInsideSelectorLine');
+
+	equal(comment.attr('data-0'), undefined, '#commentInsideLine 0');
+	equal(comment.attr('data-100'), undefined, '#commentInsideLine 100');
+});
+
+test('External stylesheets with Selector Commentet', function() {
+	var comment = $('#commentOutsideSelectorWrapped');
+
+	equal(comment.attr('data-0'), undefined, '#commentOutsideWrapped 0');
+	equal(comment.attr('data-100'), undefined, '#commentOutsideWrapped 100');
+});
+
+test('External stylesheets with Selector as Line Commentet', function() {
+	var comment = $('#commentOutsideSelectorLine');
+
+	equal(comment.attr('data-0'), undefined, '#commentOutsideLine 0');
+	equal(comment.attr('data-100'), undefined, '#commentOutsideLine 100');
+});
+
+test('Inline stylesheets Comment', function() {
+	var comment = $('#commentInline');
+
+	equal(comment.attr('data-0'), undefined, '#commentOutsideLine 0');
+	equal(comment.attr('data-100'), undefined, '#commentOutsideLine 100');
+});
