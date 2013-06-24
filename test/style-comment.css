@@ -1,0 +1,55 @@
+#commentInsideSelectorWrapped {
+	/*
+	-skrollr-animation-name:commentWrapped;
+	*/
+}
+#commentInsideSelectorLine {
+	/*-skrollr-animation-name:commentLine;*/
+}
+
+/*
+#commentOutsideSelectorWrapped {
+	-skrollr-animation-name:commentOutsideWrapped;
+}
+*/
+/*#commentOutsideSelectorLine {	-skrollr-animation-name:commentOutsideLine; } */
+
+@-skrollr-keyframes commentInsideSelectorWrapped {
+	0 {
+		left:1337px;
+	}
+
+	100 {
+		left:1337px;
+	}
+}
+
+@-skrollr-keyframes commentInsideSelectorLine {
+	0 {
+		left:1337px;
+	}
+
+	100 {
+		left:1337px;
+	}
+}
+
+@-skrollr-keyframes commentOutsideSelectorWrapped {
+	0 {
+		left:1337px;
+	}
+
+	100 {
+		left:1337px;
+	}
+}
+
+@-skrollr-keyframes commentOutsideSelectorLine {
+	0 {
+		left:1337px;
+	}
+
+	100 {
+		left:1337px;
+	}
+}
