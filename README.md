@@ -111,7 +111,7 @@ $about_section_end: $about_section_begin + $about_section_duration;
 
 	#{$about_section_end} {
 		left:0%;
-		opacity#{"[swing]"}: 1.0;
+		opacity: 1.0;
 	}
 }
 ```
