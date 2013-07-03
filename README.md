@@ -106,10 +106,12 @@ $about_section_end: $about_section_begin + $about_section_duration;
 @-skrollr-keyframes animation1 {
 	#{$about_section_begin} {
 		left:100%;
+		opacity#{"[swing]"}: 0.0;
 	}
 
 	#{$about_section_end} {
 		left:0%;
+		opacity: 1.0;
 	}
 }
 ```
@@ -117,6 +119,8 @@ $about_section_end: $about_section_begin + $about_section_duration;
 _\*mind blown\*_
 
 And of course you can use all the things you already love about Sass as well.
+
+Note that easing functions need to be interpolated as strings in Sass because of the non-standard syntax.
 
 
 Limitations
