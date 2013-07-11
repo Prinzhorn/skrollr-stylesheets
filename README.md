@@ -58,7 +58,7 @@ You can use any CSS selector you want because we are using `document.querySelect
 The script
 -----
 
-In order to use skrollr-stylesheets just put `dist/skrollr.stylesheets.min.js` in your document **below all stylesheets** you want to get considered. skrollr-stylesheets will execute right when it's included and searches for all stylesheets and processes them synchronously.
+In order to use skrollr-stylesheets, just place `dist/skrollr.stylesheets.min.js` at the bottom of your page before the closing `</body>` (but before skrollr itself). skrollr-stylesheets will execute right when it's included and searches for all stylesheets and processes them synchronously.
 
 skrollr-stylesheets doesn't expose or expect any globals (well, except for `window` and `document`, duh). You don't need to do anything but include the script.
 
