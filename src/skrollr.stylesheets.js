@@ -190,5 +190,8 @@
 		}
 	};
 
-	kickstart(document.querySelectorAll('link, style'));
+	skrollr.stylesheets = {};
+	skrollr.stylesheets.init = function() {
+            kickstart(document.querySelectorAll('link, style'));
+	};
 }(window, document));
