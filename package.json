@@ -22,7 +22,7 @@
       "url": "https://github.com/Prinzhorn/skrollr-stylesheets/blob/master/LICENSE.txt"
     }
   ],
-  "main": "dist/skrollr-stylesheets.min.js",
+  "main": "dist/skrollr.stylesheets.min.js",
   "engines": {
     "node": ">=0.8"
   },
