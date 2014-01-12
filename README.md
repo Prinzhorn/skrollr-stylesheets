@@ -1,4 +1,4 @@
-skrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
+eskrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
 ===================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
@@ -67,6 +67,8 @@ External stylesheets
 -----
 
 If you want skrollr-stylesheets to parse an external stylesheet (those using a `link` element), add an empty `data-skrollr-stylesheet` attribute to it.
+
+skrollr-stylesheets ignores external (`<link>`) stylesheets unless they have the `data-skrollr-stylesheet` attribute. For example you wouldn't want the Bootstrap or jQuery UI stylesheet to be searched, since there are no keyframes anyway. Internal/embedded stylesheets (`<style>`) are always parsed (they're usually used only in dev anyway).
 
 Example
 
