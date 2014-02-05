@@ -173,22 +173,30 @@
 
 			for(keyframeName in keyframes) {
 				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-					curElement = elements[elementIndex];
-					attributeName = 'data-' + keyframeName;
-					attributeValue = keyframes[keyframeName];
+                    curElement = elements[elementIndex];
+                    if(keyframeName == "anchor") {
+						attributeName = 'data-anchor-target';
+						attributeValue = keyframes[keyframeName].replace(/"/g, "");
+                    } else {
+						attributeName = 'data-' + keyframeName;
+						attributeValue = keyframes[keyframeName];
 
-					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
-					//The inline one may actually be the result of the keyframes from another stylesheet.
-					//Since we reversed the order of the stylesheets, everything comes together correctly here.
-					if(curElement.hasAttribute(attributeName)) {
-						attributeValue += curElement.getAttribute(attributeName);
-					}
+						//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
+						//The inline one may actually be the result of the keyframes from another stylesheet.
+						//Since we reversed the order of the stylesheets, everything comes together correctly here.
+						if(curElement.hasAttribute(attributeName)) {
+							attributeValue += curElement.getAttribute(attributeName);
+						}
+                    }
 
-					elements[elementIndex].setAttribute(attributeName, attributeValue);
+                    elements[elementIndex].setAttribute(attributeName, attributeValue);
 				}
 			}
 		}
 	};
 
-	kickstart(document.querySelectorAll('link, style'));
+	skrollr.stylesheets = {};
+	skrollr.stylesheets.init = function() {
+            kickstart(document.querySelectorAll('link, style'));
+	};
 }(window, document));
