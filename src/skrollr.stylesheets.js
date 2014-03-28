@@ -2,15 +2,17 @@
  * skrollr stylesheets.
  * Parses stylesheets and searches for skrollr keyframe declarations.
  * Converts them to data-attributes.
- * Doesn't expose any globals.
+ * Is an AMD module; returns an object that can be called with the
+ * skrollr instance when the dom is loaded.
  */
-(function(window, document, skrollr, undefined) {
+define(function() {
 	'use strict';
 
 	var sheets = [];
 	var lastCall;
 	var resizeThrottle = 30;
 	var resizeDefer;
+	var skrollr;
 
 	//Finds the declaration of an animation block.
 	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
@@ -49,7 +51,10 @@
 	};
 
 	//"main"
-	var kickstart = function(sheetElms) {
+	var kickstart = function(sheetElms, skrollrInstance) {
+		//make the provided skrollr instance accessible to other functions
+		skrollr = skrollrInstance;
+
 		//Iterate over all stylesheets, embedded and remote.
 		for(var sheetElmsIndex = 0; sheetElmsIndex < sheetElms.length; sheetElmsIndex++) {
 			var sheetElm = sheetElms[sheetElmsIndex];
@@ -248,20 +253,24 @@
 		}
 	}
 
-	//start her up
-	kickstart(document.querySelectorAll('link, style'));
-
 	//adjust on resize
 	function resizeHandler() {
 		run(true);
 	}
 
-	if(window.addEventListener) {
-		window.addEventListener("resize", resizeHandler, false);
-	}
+	return {
+		'init': function(skrollr) {
+			//start her up
+			kickstart(document.querySelectorAll('link, style'));
 
-	else if(window.attachEvent) {
-		window.attachEvent("onresize", resizeHandler);
-	}
+			if(window.addEventListener) {
+				window.addEventListener('resize', resizeHandler, false);
+			}
 
-}(window, document, skrollr));
+			else if(window.attachEvent) {
+				window.attachEvent('onresize', resizeHandler);
+			}
+		}
+	};
+
+});
