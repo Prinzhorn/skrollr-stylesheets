@@ -112,7 +112,6 @@ define(function() {
 		}
 		else {
 			lastCall = now;
-			resetSkrollrElements();
 		}
 
 		animations = {};
@@ -123,7 +122,7 @@ define(function() {
 			media = currentSheet.media;
 
 			//find the stylesheets that match the current media query, and apply them.
-			if(!matchMedia || (media && matchMedia(media).matches)) {
+			if(!matchMedia || !media || matchMedia(media).matches) {
 				selectors = selectors.concat(currentSheet.selectors);
 
 				for(var key in currentSheet.animations) {
