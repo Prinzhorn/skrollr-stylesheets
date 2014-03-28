@@ -7,8 +7,10 @@
 (function(window, document, undefined) {
 	'use strict';
 
-	var content;
-	var contents = [];
+	var sheets = [];
+	var lastCall;
+	var resizeThrottle = 30;
+	var resizeDefer;
 
 	//Finds the declaration of an animation block.
 	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
@@ -47,51 +49,83 @@
 	};
 
 	//"main"
-	var kickstart = function(stylesheets) {
+	var kickstart = function(sheetElms) {
 		//Iterate over all stylesheets, embedded and remote.
-		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
-			var sheet = stylesheets[stylesheetIndex];
+		for(var sheetElmsIndex = 0; sheetElmsIndex < sheetElms.length; sheetElmsIndex++) {
+			var sheetElm = sheetElms[sheetElmsIndex];
+			var content;
+			var media;
 
-			if(sheet.tagName === 'LINK') {
-				if(sheet.getAttribute('data-skrollr-stylesheet') === null) {
+			if(sheetElm.tagName === 'LINK') {
+				if(sheetElm.getAttribute('data-skrollr-stylesheet') === null) {
 					continue;
 				}
 
-				//Test media attribute if matchMedia available.
-				if(window.matchMedia) {
-					var media = sheet.getAttribute('media');
-
-					if(media && !matchMedia(media).matches) {
-						continue;
-					}
-				}
-
 				//Remote stylesheet, fetch it (synchrnonous).
-				content = fetchRemote(sheet.href);
+				content = fetchRemote(sheetElm.href);
 			} else {
 				//Embedded stylesheet, grab the node content.
-				content = sheet.textContent || sheet.innerText || sheet.innerHTML;
+				content = sheetElm.textContent || sheetElm.innerText || sheetElm.innerHTML;
 			}
 
 			if(content) {
-				contents.push(content);
+				media = sheetElm.getAttribute('media');
+				sheets.push({
+					'content':content, 
+					'matchesMedia': !matchMedia || (media && matchMedia(media).matches), 
+					'animations': {}, 
+					'selectors': []
+				});
 			}
 		}
 
 		//We take the stylesheets in reverse order.
 		//This is needed to ensure correct order of stylesheets and inline styles.
-		contents.reverse();
-
-		var animations = {};
-		var selectors = [];
+		sheets.reverse();
 
 		//Now parse all stylesheets.
-		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
-			content = contents[contentIndex];
+		for(sheetIndex = 0; sheetIndex < sheets.length; sheetIndex++) {
+			content = sheets[sheetIndex].content;
 
-			parseDeclarations(content, animations);
+			parseDeclarations(content, sheets[sheetIndex].animations);
 
-			parseUsage(content, selectors);
+			parseUsage(content, sheets[sheetIndex].selectors);
+		}
+
+		run(false);
+	};
+
+	var run = function(fromResize) {
+		var now = (new Date()).getTime();
+		var animations;
+		var selectors;
+		var currentSheet;
+
+		if(fromResize && lastCall && now - lastCall < resizeThrottle) {
+			window.clearTimeout(resizeDefer);
+			resizeDefer = window.setTimeout(run, resizeThrottle);
+			return;
+		}
+		else {
+			lastCall = now;
+		}
+
+		animations = {};
+		selectors  = [];
+
+		for(var sheetIndex = 0, sheetCount = sheets.length; sheetIndex < sheetCount; sheetIndex++) {
+			currentSheet = sheets[sheetIndex];
+
+			//find the stylesheets that match the current media query, and apply them.
+			if(currentSheet.matchesMedia) {
+				selectors = selectors.concat(currentSheet.selectors);
+
+				for(var key in currentSheet.animations) {
+					if (currentSheet.animations.hasOwnProperty(key)) {
+						animations[key] = currentSheet.animations[key];
+					}
+				}
+			}
 		}
 
 		//Apply the keyframes to the elements.
@@ -153,7 +187,8 @@
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(animations, selectors) {
+	var applyKeyframes = function(_animations, _selectors) {
+
 		var elements;
 		var keyframes;
 		var keyframeName;
@@ -161,6 +196,10 @@
 		var attributeName;
 		var attributeValue;
 		var curElement;
+
+		animations = _animations || animations;
+		selectors = _selectors || selectors;
+
 
 		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
 			elements = document.querySelectorAll(selectors[selectorIndex][0]);
@@ -183,12 +222,50 @@
 					if(curElement.hasAttribute(attributeName)) {
 						attributeValue += curElement.getAttribute(attributeName);
 					}
-
-					elements[elementIndex].setAttribute(attributeName, attributeValue);
+					curElement.setAttribute(attributeName, attributeValue);
 				}
 			}
 		}
 	};
 
+	function resetSkrollrElements() {
+		var elements = document.body.querySelectorAll('*');
+		var attrArray = [];
+		var elementIndex;
+		var curElement;
+
+		for(elementIndex = 0, elementsLength = elements.length; elementIndex < elementsLength; elementIndex++) {
+			curElement = elements[elementIndex];
+
+			for(var k = 0; k < curElement.attributes.length; k++) {
+				var attr = curElement.attributes[k];
+
+				if(/data-[0-9]+/.test(attr.name)) {
+					attArray.push(attr.name);
+				}
+			}
+
+			for(var k = 0; k < attArray.length; k++) {
+				curElement.removeAttribute(attArray[k]);
+			}
+		}
+	}
+
+	//start her up
 	kickstart(document.querySelectorAll('link, style'));
+
+	//adjust on resize
+	function resizeHandler() {
+		resetSkrollrElements();
+		run(true);
+	}
+
+	if(window.addEventListener) {
+		window.addEventListener("resize", resizeHandler, false);
+	}
+
+	else if(w.attachEvent) {
+		window.attachEvent("onresize", resizeHandler);
+	}
+
 }(window, document));
