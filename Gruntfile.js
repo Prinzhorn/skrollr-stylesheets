@@ -14,10 +14,12 @@ module.exports = function(grunt) {
 				unused: true,
 				strict: true,
 				trailing: true,
+				funcscope: true,
 				globals: {
 					window: true,
 					document: true,
 					navigator: true,
+					define: true,
 					XMLHttpRequest: true,
 					XDomainRequest: true,
 					matchMedia: true

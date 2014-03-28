@@ -247,7 +247,7 @@ define(function() {
 				}
 			}
 
-			for(var k = 0; k < attrArray.length; k++) {
+			for(k = 0; k < attrArray.length; k++) {
 				curElement.removeAttribute(attrArray[k]);
 			}
 		}
