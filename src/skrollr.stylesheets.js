@@ -261,7 +261,7 @@ define(function() {
 	return {
 		'init': function(skrollr) {
 			//start her up
-			kickstart(document.querySelectorAll('link, style'));
+			kickstart(document.querySelectorAll('link, style'), skrollr);
 
 			if(window.addEventListener) {
 				window.addEventListener('resize', resizeHandler, false);
