@@ -4,7 +4,7 @@
  * Converts them to data-attributes.
  * Doesn't expose any globals.
  */
-(function(window, document, undefined) {
+(function(window, document, skrollr, undefined) {
 	'use strict';
 
 	var sheets = [];
@@ -54,7 +54,6 @@
 		for(var sheetElmsIndex = 0; sheetElmsIndex < sheetElms.length; sheetElmsIndex++) {
 			var sheetElm = sheetElms[sheetElmsIndex];
 			var content;
-			var media;
 
 			if(sheetElm.tagName === 'LINK') {
 				if(sheetElm.getAttribute('data-skrollr-stylesheet') === null) {
@@ -69,10 +68,9 @@
 			}
 
 			if(content) {
-				media = sheetElm.getAttribute('media');
 				sheets.push({
-					'content':content, 
-					'matchesMedia': !matchMedia || (media && matchMedia(media).matches), 
+					'content':content,
+					'media': sheetElm.getAttribute('media'),
 					'animations': {}, 
 					'selectors': []
 				});
@@ -84,7 +82,7 @@
 		sheets.reverse();
 
 		//Now parse all stylesheets.
-		for(sheetIndex = 0; sheetIndex < sheets.length; sheetIndex++) {
+		for(var sheetIndex = 0; sheetIndex < sheets.length; sheetIndex++) {
 			content = sheets[sheetIndex].content;
 
 			parseDeclarations(content, sheets[sheetIndex].animations);
@@ -100,6 +98,7 @@
 		var animations;
 		var selectors;
 		var currentSheet;
+		var media;
 
 		if(fromResize && lastCall && now - lastCall < resizeThrottle) {
 			window.clearTimeout(resizeDefer);
@@ -108,6 +107,7 @@
 		}
 		else {
 			lastCall = now;
+			resetSkrollrElements();
 		}
 
 		animations = {};
@@ -115,9 +115,10 @@
 
 		for(var sheetIndex = 0, sheetCount = sheets.length; sheetIndex < sheetCount; sheetIndex++) {
 			currentSheet = sheets[sheetIndex];
+			media = currentSheet.media;
 
 			//find the stylesheets that match the current media query, and apply them.
-			if(currentSheet.matchesMedia) {
+			if(!matchMedia || (media && matchMedia(media).matches)) {
 				selectors = selectors.concat(currentSheet.selectors);
 
 				for(var key in currentSheet.animations) {
@@ -129,7 +130,9 @@
 		}
 
 		//Apply the keyframes to the elements.
+		resetSkrollrElements();
 		applyKeyframes(animations, selectors);
+		skrollr.get().refresh();
 	};
 
 	//Finds animation declarations and puts them into the output map.
@@ -187,8 +190,7 @@
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(_animations, _selectors) {
-
+	var applyKeyframes = function(animations, selectors) {
 		var elements;
 		var keyframes;
 		var keyframeName;
@@ -196,10 +198,6 @@
 		var attributeName;
 		var attributeValue;
 		var curElement;
-
-		animations = _animations || animations;
-		selectors = _selectors || selectors;
-
 
 		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
 			elements = document.querySelectorAll(selectors[selectorIndex][0]);
@@ -231,22 +229,21 @@
 	function resetSkrollrElements() {
 		var elements = document.body.querySelectorAll('*');
 		var attrArray = [];
-		var elementIndex;
 		var curElement;
 
-		for(elementIndex = 0, elementsLength = elements.length; elementIndex < elementsLength; elementIndex++) {
+		for(var elementIndex = 0, elementsLength = elements.length; elementIndex < elementsLength; elementIndex++) {
 			curElement = elements[elementIndex];
 
 			for(var k = 0; k < curElement.attributes.length; k++) {
 				var attr = curElement.attributes[k];
 
 				if(/data-[0-9]+/.test(attr.name)) {
-					attArray.push(attr.name);
+					attrArray.push(attr.name);
 				}
 			}
 
-			for(var k = 0; k < attArray.length; k++) {
-				curElement.removeAttribute(attArray[k]);
+			for(var k = 0; k < attrArray.length; k++) {
+				curElement.removeAttribute(attrArray[k]);
 			}
 		}
 	}
@@ -256,7 +253,6 @@
 
 	//adjust on resize
 	function resizeHandler() {
-		resetSkrollrElements();
 		run(true);
 	}
 
@@ -264,8 +260,8 @@
 		window.addEventListener("resize", resizeHandler, false);
 	}
 
-	else if(w.attachEvent) {
+	else if(window.attachEvent) {
 		window.attachEvent("onresize", resizeHandler);
 	}
 
-}(window, document));
+}(window, document, skrollr));
