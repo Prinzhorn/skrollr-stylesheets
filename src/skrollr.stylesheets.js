@@ -71,7 +71,7 @@
 				sheets.push({
 					'content':content,
 					'media': sheetElm.getAttribute('media'),
-					'animations': {}, 
+					'animations': {},
 					'selectors': []
 				});
 			}
