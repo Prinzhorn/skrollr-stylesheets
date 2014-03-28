@@ -137,7 +137,7 @@ define(function() {
 		//Apply the keyframes to the elements.
 		resetSkrollrElements();
 		applyKeyframes(animations, selectors);
-		skrollr.get().refresh();
+		skrollr.refresh();
 	};
 
 	//Finds animation declarations and puts them into the output map.
