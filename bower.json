@@ -1,0 +1,18 @@
+{
+  "name": "skrollr-stylesheets",
+  "version": "0.0.1",
+  "homepage": "https://github.com/ethanresnick/skrollr-stylesheets",
+  "authors": [
+    "Ethan Resnick <ethan.resnick@gmail.com>"
+  ],
+  "description": "skrollr-styleshets for Bower & AMD",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
