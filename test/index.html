@@ -11,7 +11,6 @@
 	<link rel="stylesheet" type="text/css" href="style-ignore.css" />
 	<link rel="stylesheet" type="text/css" href="style-media-ignore.css" media="only screen and (max-width: 1px)" data-skrollr-stylesheet />
 	<link rel="stylesheet" type="text/css" href="style-media-apply.css" media="only screen and (min-width: 1px)" data-skrollr-stylesheet />
-
 	<style>
 	#simple1 {
 		-skrollr-animation-name: test1;
@@ -97,13 +96,32 @@
 
 	<div id="media"></div>
 
-	<div id="inline" data-0="top:0px;"></div>
+	<div id="inline" data-ss-1101='{"0":"top:0px;"}'></div>
 
 	<div id="qunit"></div>
 
-	<script src="qunit.js" type="text/javascript"></script>
 	<script src="jquery.js" type="text/javascript"></script>
-	<script src="../src/skrollr.stylesheets.js" type="text/javascript"></script>
+	<script src="qunit.js" type="text/javascript"></script>
+	<script src="require.js" type="text/javascript"></script>
+	<script>
+		// Defer Qunit so RequireJS can work its magic and resolve all modules.
+		QUnit.config.autostart = false;
+
+		require.config({
+			paths: {
+				"skrollr-stylesheets": "../src/skrollr.stylesheets"
+			}
+		});
+
+		$(function() {
+			require(["skrollr-stylesheets"], function(s) {
+				var skrollrMock = {'refresh': function() {}};
+				s.init(skrollrMock);
+				QUnit.start();
+				
+			});
+		});
+	</script>
 	<script src="tests.js" type="text/javascript"></script>
 </body>
 </html>

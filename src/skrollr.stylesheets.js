@@ -2,13 +2,20 @@
  * skrollr stylesheets.
  * Parses stylesheets and searches for skrollr keyframe declarations.
  * Converts them to data-attributes.
- * Doesn't expose any globals.
+ * Is an AMD module; returns an object that can be called with the
+ * skrollr instance when the dom is loaded.
  */
-(function(window, document, undefined) {
+define(function() {
 	'use strict';
 
-	var content;
-	var contents = [];
+	var sheets = [];
+	var lastCall;
+	var resizeThrottle = 30;
+	var resizeDefer;
+	var skrollr;
+	var lastMatchingStylesheetsKey = '';
+	var processedMatchingStylesheetsKeys = {};
+	var ssPrefix = 'ss';
 
 	//Finds the declaration of an animation block.
 	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
@@ -47,55 +54,82 @@
 	};
 
 	//"main"
-	var kickstart = function(stylesheets) {
-		//Iterate over all stylesheets, embedded and remote.
-		for(var stylesheetIndex = 0; stylesheetIndex < stylesheets.length; stylesheetIndex++) {
-			var sheet = stylesheets[stylesheetIndex];
+	var kickstart = function(sheetElms, skrollrInstance) {
+		//make the provided skrollr instance accessible to other functions
+		skrollr = skrollrInstance;
 
-			if(sheet.tagName === 'LINK') {
-				if(sheet.getAttribute('data-skrollr-stylesheet') === null) {
+		//Iterate over all stylesheets, embedded and remote.
+		for(var i = 0, len = sheetElms.length; i < len; i++) {
+			var sheetElm = sheetElms[i];
+			var content;
+
+			if(sheetElm.tagName === 'LINK') {
+				if(sheetElm.getAttribute('data-skrollr-stylesheet') === null) {
 					continue;
 				}
 
-				//Test media attribute if matchMedia available.
-				if(window.matchMedia) {
-					var media = sheet.getAttribute('media');
-
-					if(media && !matchMedia(media).matches) {
-						continue;
-					}
-				}
-
 				//Remote stylesheet, fetch it (synchrnonous).
-				content = fetchRemote(sheet.href);
+				content = fetchRemote(sheetElm.href);
 			} else {
 				//Embedded stylesheet, grab the node content.
-				content = sheet.textContent || sheet.innerText || sheet.innerHTML;
+				content = sheetElm.textContent || sheetElm.innerText || sheetElm.innerHTML;
 			}
 
 			if(content) {
-				contents.push(content);
+				sheets.push({
+					'content':content,
+					'media': sheetElm.getAttribute('media'),
+					'animations': {},
+					'selectors': []
+				});
 			}
 		}
 
 		//We take the stylesheets in reverse order.
 		//This is needed to ensure correct order of stylesheets and inline styles.
-		contents.reverse();
-
-		var animations = {};
-		var selectors = [];
+		sheets.reverse();
 
 		//Now parse all stylesheets.
-		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
-			content = contents[contentIndex];
-
-			parseDeclarations(content, animations);
-
-			parseUsage(content, selectors);
+		for(var sheetIndex = 0; sheetIndex < sheets.length; sheetIndex++) {
+			content = sheets[sheetIndex].content;
+			parseDeclarations(content, sheets[sheetIndex].animations);
+			parseUsage(content, sheets[sheetIndex].selectors);
 		}
 
-		//Apply the keyframes to the elements.
-		applyKeyframes(animations, selectors);
+		run(false);
+	};
+
+	var run = function(fromResize) {
+		var now = (new Date()).getTime();
+		var matchingStylesheetsKey;
+
+		if(fromResize && lastCall && now - lastCall < resizeThrottle) {
+			window.clearTimeout(resizeDefer);
+			resizeDefer = window.setTimeout(run, resizeThrottle);
+			return;
+		}
+		else {
+			lastCall = now;
+		}
+
+		matchingStylesheetsKey = getMatchingStylesheetsKey(sheets);
+
+		//the active stylesheets have changed, so we have to do something.
+		if(matchingStylesheetsKey !== lastMatchingStylesheetsKey) {
+
+			resetSkrollrElements();
+
+			//if we haven't seen this set of matching stylesheets before,
+			//we need to save the keyframes into the dom for future reference.
+			if(!processedMatchingStylesheetsKeys[matchingStylesheetsKey]) {
+				saveKeyframesToDOM(sheets, matchingStylesheetsKey);
+				processedMatchingStylesheetsKeys[matchingStylesheetsKey] = true;
+			}
+
+			//Apply the keyframes to the elements.
+			applyKeyframes(matchingStylesheetsKey);
+			skrollr.refresh();
+		}
 	};
 
 	//Finds animation declarations and puts them into the output map.
@@ -153,42 +187,157 @@
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(animations, selectors) {
-		var elements;
-		var keyframes;
-		var keyframeName;
-		var elementIndex;
-		var attributeName;
-		var attributeValue;
+	var applyKeyframes = function(matchingStylesheetsKey) {
+		var attrName = 'data-'+ ssPrefix + '-'+ matchingStylesheetsKey;
+		var elements = document.querySelectorAll('['+attrName+']');
+		var keyframeData;
+
+		for(var i=0, len = elements.length; i < len; i++) {
+			keyframeData = JSON.parse(elements[i].getAttribute(attrName)) || {};
+
+			for(var keyframeName in keyframeData) {
+				elements[i].setAttribute('data-' + keyframeName, keyframeData[keyframeName]);
+			}
+		}
+	};
+
+	function resetSkrollrElements() {
+		var elements = document.body.querySelectorAll('*');
+		var attrArray = [];
 		var curElement;
 
-		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
-			elements = document.querySelectorAll(selectors[selectorIndex][0]);
+		for(var elementIndex = 0, elementsLength = elements.length; elementIndex < elementsLength; elementIndex++) {
+			curElement = elements[elementIndex];
+
+			for(var k = 0; k < curElement.attributes.length; k++) {
+				var attr = curElement.attributes[k];
+
+				if(/data-[0-9]+/.test(attr.name)) {
+					attrArray.push(attr.name);
+				}
+			}
+
+			for(k = 0; k < attrArray.length; k++) {
+				curElement.removeAttribute(attrArray[k]);
+			}
+		}
+	}
+
+	function saveKeyframesToDOM(sheets, matchingStylesheetsKey) {
+		var selectors = [];
+		var animations = {};
+		var attrName = 'data-'+ ssPrefix + '-' + matchingStylesheetsKey;
+		var curSheet;
+		var curSelector;
+		var elements;
+		var curElement;
+		var curData;
+		var keyframes;
+		var keyframeName;
+
+		for(var i = 0, len = sheets.length; i < len; i++) {
+			curSheet = sheets[i];
+
+			//find the stylesheets that match the current media query, and apply them.
+			if(matchingStylesheetsKey.charAt(i)=='1') {
+				selectors = selectors.concat(curSheet.selectors);
+
+				for(var key in curSheet.animations) {
+					if (curSheet.animations.hasOwnProperty(key)) {
+						animations[key] = curSheet.animations[key];
+					}
+				}
+			}
+		}
+
+		for(var j = 0, len2 = selectors.length; j < len2; j++) {
+			curSelector = selectors[j];
+			elements = document.querySelectorAll(curSelector[0]);
 
 			if(!elements) {
 				continue;
 			}
 
-			keyframes = animations[selectors[selectorIndex][1]];
+			keyframes = animations[curSelector[1]];
 
-			for(keyframeName in keyframes) {
-				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-					curElement = elements[elementIndex];
-					attributeName = 'data-' + keyframeName;
-					attributeValue = keyframes[keyframeName];
+			for(var k = 0, len3 = elements.length; k < len3; k++) {
+				curElement = elements[k];
+				curData = JSON.parse(curElement.getAttribute(attrName) || '{}');
+
+				for(keyframeName in keyframes) {
+					//add a semicolon onto the end to make sure we can append more properties later without corruption
+					if(keyframes[keyframeName].charAt(keyframes[keyframeName].length - 1) != ';') {
+						keyframes[keyframeName] += ';';
+					}
 
 					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
 					//The inline one may actually be the result of the keyframes from another stylesheet.
 					//Since we reversed the order of the stylesheets, everything comes together correctly here.
-					if(curElement.hasAttribute(attributeName)) {
-						attributeValue += curElement.getAttribute(attributeName);
+					if(curData[keyframeName]) {
+						curData[keyframeName] = keyframes[keyframeName] + curData[keyframeName];
 					}
-
-					elements[elementIndex].setAttribute(attributeName, attributeValue);
+					else {
+						curData[keyframeName] = keyframes[keyframeName];
+					}
 				}
+
+				curElement.setAttribute(attrName, JSON.stringify(curData));
+			}
+		}
+	}
+
+	function getMatchingStylesheetsKey(sheets) {
+		var key = '';
+		var currentSheet;
+
+		if(!matchMedia) {
+			return strRepeat('1', sheets.length);
+		}
+
+		else {
+			for(var i = 0, len = sheets.length; i < len; i++) {
+				currentSheet = sheets[i];
+				key = key.concat(!currentSheet.media || matchMedia(currentSheet.media).matches ? '1' : '0');
+			}
+		}
+
+		return key;
+	}
+
+	function strRepeat(pattern, count) {
+		var result = '';
+
+		if (count < 1) {
+			return result;
+		}
+
+		while (count > 0) {
+			if (count & 1) {
+				result += pattern;
+			}
+			count >>= 1, pattern += pattern;
+		}
+		return result;
+	}
+
+	//adjust on resize
+	function resizeHandler() {
+		run(true);
+	}
+
+	return {
+		'init': function(skrollr) {
+			//start her up
+			kickstart(document.querySelectorAll('link, style'), skrollr);
+
+			if(window.addEventListener) {
+				window.addEventListener('resize', resizeHandler, false);
+			}
+
+			else if(window.attachEvent) {
+				window.attachEvent('onresize', resizeHandler);
 			}
 		}
 	};
 
-	kickstart(document.querySelectorAll('link, style'));
-}(window, document));
+});
