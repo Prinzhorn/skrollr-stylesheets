@@ -265,6 +265,11 @@ define(function() {
 				curData = JSON.parse(curElement.getAttribute(attrName) || '{}');
 
 				for(keyframeName in keyframes) {
+					//add a semicolon onto the end to make sure we can append more properties later without corruption
+					if(keyframes[keyframeName].charAt(keyframes[keyframeName].length - 1) != ';') {
+						keyframes[keyframeName] += ';';
+					}
+
 					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
 					//The inline one may actually be the result of the keyframes from another stylesheet.
 					//Since we reversed the order of the stylesheets, everything comes together correctly here.
