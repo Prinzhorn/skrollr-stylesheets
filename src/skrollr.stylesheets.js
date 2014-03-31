@@ -13,6 +13,9 @@ define(function() {
 	var resizeThrottle = 30;
 	var resizeDefer;
 	var skrollr;
+	var lastMatchingStylesheetsKey = '';
+	var processedMatchingStylesheetsKeys = {};
+	var ssPrefix = 'ss';
 
 	//Finds the declaration of an animation block.
 	var rxAnimation = /@-skrollr-keyframes\s+([\w-]+)/g;
@@ -56,8 +59,8 @@ define(function() {
 		skrollr = skrollrInstance;
 
 		//Iterate over all stylesheets, embedded and remote.
-		for(var sheetElmsIndex = 0; sheetElmsIndex < sheetElms.length; sheetElmsIndex++) {
-			var sheetElm = sheetElms[sheetElmsIndex];
+		for(var i = 0, len = sheetElms.length; i < len; i++) {
+			var sheetElm = sheetElms[i];
 			var content;
 
 			if(sheetElm.tagName === 'LINK') {
@@ -89,9 +92,7 @@ define(function() {
 		//Now parse all stylesheets.
 		for(var sheetIndex = 0; sheetIndex < sheets.length; sheetIndex++) {
 			content = sheets[sheetIndex].content;
-
 			parseDeclarations(content, sheets[sheetIndex].animations);
-
 			parseUsage(content, sheets[sheetIndex].selectors);
 		}
 
@@ -100,10 +101,7 @@ define(function() {
 
 	var run = function(fromResize) {
 		var now = (new Date()).getTime();
-		var animations;
-		var selectors;
-		var currentSheet;
-		var media;
+		var matchingStylesheetsKey;
 
 		if(fromResize && lastCall && now - lastCall < resizeThrottle) {
 			window.clearTimeout(resizeDefer);
@@ -114,29 +112,24 @@ define(function() {
 			lastCall = now;
 		}
 
-		animations = {};
-		selectors  = [];
+		matchingStylesheetsKey = getMatchingStylesheetsKey(sheets);
 
-		for(var sheetIndex = 0, sheetCount = sheets.length; sheetIndex < sheetCount; sheetIndex++) {
-			currentSheet = sheets[sheetIndex];
-			media = currentSheet.media;
+		//the active stylesheets have changed, so we have to do something.
+		if(matchingStylesheetsKey !== lastMatchingStylesheetsKey) {
 
-			//find the stylesheets that match the current media query, and apply them.
-			if(!matchMedia || !media || matchMedia(media).matches) {
-				selectors = selectors.concat(currentSheet.selectors);
+			resetSkrollrElements();
 
-				for(var key in currentSheet.animations) {
-					if (currentSheet.animations.hasOwnProperty(key)) {
-						animations[key] = currentSheet.animations[key];
-					}
-				}
+			//if we haven't seen this set of matching stylesheets before,
+			//we need to save the keyframes into the dom for future reference.
+			if(!processedMatchingStylesheetsKeys[matchingStylesheetsKey]) {
+				saveKeyframesToDOM(sheets, matchingStylesheetsKey);
+				processedMatchingStylesheetsKeys[matchingStylesheetsKey] = true;
 			}
-		}
 
-		//Apply the keyframes to the elements.
-		resetSkrollrElements();
-		applyKeyframes(animations, selectors);
-		skrollr.refresh();
+			//Apply the keyframes to the elements.
+			applyKeyframes(matchingStylesheetsKey);
+			skrollr.refresh();
+		}
 	};
 
 	//Finds animation declarations and puts them into the output map.
@@ -194,38 +187,16 @@ define(function() {
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(animations, selectors) {
-		var elements;
-		var keyframes;
-		var keyframeName;
-		var elementIndex;
-		var attributeName;
-		var attributeValue;
-		var curElement;
+	var applyKeyframes = function(matchingStylesheetsKey) {
+		var attrName = 'data-'+ ssPrefix + '-'+ matchingStylesheetsKey;
+		var elements = document.querySelectorAll('['+attrName+']');
+		var keyframeData;
 
-		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
-			elements = document.querySelectorAll(selectors[selectorIndex][0]);
+		for(var i=0, len = elements.length; i < len; i++) {
+			keyframeData = JSON.parse(elements[i].getAttribute(attrName)) || {};
 
-			if(!elements) {
-				continue;
-			}
-
-			keyframes = animations[selectors[selectorIndex][1]];
-
-			for(keyframeName in keyframes) {
-				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-					curElement = elements[elementIndex];
-					attributeName = 'data-' + keyframeName;
-					attributeValue = keyframes[keyframeName];
-
-					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
-					//The inline one may actually be the result of the keyframes from another stylesheet.
-					//Since we reversed the order of the stylesheets, everything comes together correctly here.
-					if(curElement.hasAttribute(attributeName)) {
-						attributeValue += curElement.getAttribute(attributeName);
-					}
-					curElement.setAttribute(attributeName, attributeValue);
-				}
+			for(var keyframeName in keyframeData) {
+				elements[i].setAttribute('data-' + keyframeName, keyframeData[keyframeName]);
 			}
 		}
 	};
@@ -250,6 +221,98 @@ define(function() {
 				curElement.removeAttribute(attrArray[k]);
 			}
 		}
+	}
+
+	function saveKeyframesToDOM(sheets, matchingStylesheetsKey) {
+		var selectors = [];
+		var animations = {};
+		var attrName = 'data-'+ ssPrefix + '-' + matchingStylesheetsKey;
+		var curSheet;
+		var curSelector;
+		var elements;
+		var curElement;
+		var curData;
+		var keyframes;
+		var keyframeName;
+
+		for(var i = 0, len = sheets.length; i < len; i++) {
+			curSheet = sheets[i];
+
+			//find the stylesheets that match the current media query, and apply them.
+			if(matchingStylesheetsKey.charAt(i)=='1') {
+				selectors = selectors.concat(curSheet.selectors);
+
+				for(var key in curSheet.animations) {
+					if (curSheet.animations.hasOwnProperty(key)) {
+						animations[key] = curSheet.animations[key];
+					}
+				}
+			}
+		}
+
+		for(var j = 0, len2 = selectors.length; j < len2; j++) {
+			curSelector = selectors[j];
+			elements = document.querySelectorAll(curSelector[0]);
+
+			if(!elements) {
+				continue;
+			}
+
+			keyframes = animations[curSelector[1]];
+
+			for(var k = 0, len3 = elements.length; k < len3; k++) {
+				curElement = elements[k];
+				curData = JSON.parse(curElement.getAttribute(attrName) || '{}');
+
+				for(keyframeName in keyframes) {
+					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
+					//The inline one may actually be the result of the keyframes from another stylesheet.
+					//Since we reversed the order of the stylesheets, everything comes together correctly here.
+					if(curData[keyframeName]) {
+						curData[keyframeName] = keyframes[keyframeName] + curData[keyframeName];
+					}
+					else {
+						curData[keyframeName] = keyframes[keyframeName];
+					}
+				}
+
+				curElement.setAttribute(attrName, JSON.stringify(curData));
+			}
+		}
+	}
+
+	function getMatchingStylesheetsKey(sheets) {
+		var key = '';
+		var currentSheet;
+
+		if(!matchMedia) {
+			return strRepeat('1', sheets.length);
+		}
+
+		else {
+			for(var i = 0, len = sheets.length; i < len; i++) {
+				currentSheet = sheets[i];
+				key = key.concat(!currentSheet.media || matchMedia(currentSheet.media).matches ? '1' : '0');
+			}
+		}
+
+		return key;
+	}
+
+	function strRepeat(pattern, count) {
+		var result = '';
+
+		if (count < 1) {
+			return result;
+		}
+
+		while (count > 0) {
+			if (count & 1) {
+				result += pattern;
+			}
+			count >>= 1, pattern += pattern;
+		}
+		return result;
 	}
 
 	//adjust on resize
