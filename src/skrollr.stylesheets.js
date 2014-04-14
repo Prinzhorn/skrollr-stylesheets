@@ -1,5 +1,10 @@
 /*!
  * skrollr stylesheets.
+ *
+ * Alexander Prinzhorn
+ * https://github.com/Prinzhorn/skrollr-stylesheets
+ * Free to use under terms of MIT license
+ *
  * Parses stylesheets and searches for skrollr keyframe declarations.
  * Converts them to data-attributes.
  * Doesn't expose any globals.
