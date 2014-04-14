@@ -181,9 +181,15 @@
 					//The inline one may actually be the result of the keyframes from another stylesheet.
 					//Since we reversed the order of the stylesheets, everything comes together correctly here.
 					if(curElement.hasAttribute(attributeName)) {
+						if(attributeValue[attributeValue.length - 1] != ';') {
+							attributeValue += ';';
+						}
 						attributeValue += curElement.getAttribute(attributeName);
 					}
 
+					if(attributeValue[attributeValue.length - 1] != ';') {
+						attributeValue += ';';
+					}
 					elements[elementIndex].setAttribute(attributeName, attributeValue);
 				}
 			}
