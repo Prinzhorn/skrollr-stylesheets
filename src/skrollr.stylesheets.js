@@ -165,7 +165,7 @@
 		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
 			elements = document.querySelectorAll(selectors[selectorIndex][0]);
 
-			if(!elements) {
+			if(!elements || elements.length == 0) {
 				continue;
 			}
 
