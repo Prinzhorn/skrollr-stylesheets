@@ -89,17 +89,17 @@
 		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
 			content = contents[contentIndex];
 
-			parseDeclarations(content, animations);
+			parseAnimationDeclarations(content, animations);
 
-			parseUsage(content, selectors);
+			parseAnimationUsage(content, selectors);
 		}
 
 		//Apply the keyframes to the elements.
-		applyKeyframes(animations, selectors);
+		applyKeyframeAttributes(animations, selectors);
 	};
 
 	//Finds animation declarations and puts them into the output map.
-	var parseDeclarations = function(input, output) {
+	var parseAnimationDeclarations = function(input, output) {
 		rxAnimation.lastIndex = 0;
 
 		var animation;
@@ -126,34 +126,44 @@
 		}
 	};
 
+	//Extracts the selector of the given block by walking backwards to the start of the block.
+	var extractSelector = function(input, startIndex) {
+		var begin;
+		var end = startIndex;
+
+		//First find the curly bracket that opens this block.
+		while(end-- && input.charAt(end) !== '{') {}
+
+		//The end is now fixed to the right of the selector.
+		//Now start there to find the begin of the selector.
+		begin = end;
+
+		//Now walk farther backwards until we grabbed the whole selector.
+		//This either ends at beginning of string or at end of next block.
+		while(begin-- && input.charAt(begin - 1) !== '}') {}
+
+		//Return the cleaned selector.
+		return input.substring(begin, end).replace(/[\n\r\t]/g, '');
+	};
+
 	//Finds usage of animations and puts the selectors into the output array.
-	var parseUsage = function(input, output) {
+	var parseAnimationUsage = function(input, output) {
+		var match;
+		var selector;
+
 		rxAnimationUsage.lastIndex = 0;
 
-		var match;
-		var begin;
-		var end;
-
 		while((match = rxAnimationUsage.exec(input)) !== null) {
-			//This match is inside a style declaration.
-			//We need to walk backwards to find the selector.
-
-			//First find the curly bracket that opens this block.
-			end = rxAnimationUsage.lastIndex;
-			while(end-- && input.charAt(end) !== '{') {}
-
-			//Now walk farther backwards until we grabbed the whole selector.
-			//This either ends at beginning of string or at end of next block.
-			begin = end;
-			while(begin-- && input.charAt(begin - 1) !== '}') {}
+			//Extract the selector of the block we found the animation in.
+			selector = extractSelector(input, rxAnimationUsage.lastIndex);
 
 			//Associate this selector with the animation name.
-			output.push([input.substring(begin, end).replace(/[\n\r\t]/g, ''), match[1]]);
+			output.push([selector, match[1]]);
 		}
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(animations, selectors) {
+	var applyKeyframeAttributes = function(animations, selectors) {
 		var elements;
 		var keyframes;
 		var keyframeName;
