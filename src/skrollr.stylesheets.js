@@ -23,6 +23,9 @@
 	//Finds usages of the animation.
 	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*([\w-]+)/g;
 
+	//Finds usages of attribute setters.
+	var rxAttributeSetter = /-skrollr-(anchor-target|smooth-scrolling|emit-events)\s*:\s*['"]([^'"]+)['"]/g;
+
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
 
@@ -84,18 +87,19 @@
 
 		var animations = {};
 		var selectors = [];
+		var attributes = [];
 
 		//Now parse all stylesheets.
 		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
 			content = contents[contentIndex];
 
 			parseAnimationDeclarations(content, animations);
-
 			parseAnimationUsage(content, selectors);
+			parseAttributeSetters(content, attributes);
 		}
 
-		//Apply the keyframes to the elements.
 		applyKeyframeAttributes(animations, selectors);
+		applyAttributeSetters(attributes);
 	};
 
 	//Finds animation declarations and puts them into the output map.
@@ -162,6 +166,22 @@
 		}
 	};
 
+	//Finds usage of attribute setters and puts the selector and attribute data into the output array.
+	var parseAttributeSetters = function(input, output) {
+		var match;
+		var selector;
+
+		rxAttributeSetter.lastIndex = 0;
+
+		while((match = rxAttributeSetter.exec(input)) !== null) {
+			//Extract the selector of the block we found the animation in.
+			selector = extractSelector(input, rxAttributeSetter.lastIndex);
+
+			//Associate this selector with the attribute name and value.
+			output.push([selector, match[1], match[2]]);
+		}
+	};
+
 	//Applies the keyframes (as data-attributes) to the elements.
 	var applyKeyframeAttributes = function(animations, selectors) {
 		var elements;
@@ -194,8 +214,32 @@
 						attributeValue += curElement.getAttribute(attributeName);
 					}
 
-					elements[elementIndex].setAttribute(attributeName, attributeValue);
+					curElement.setAttribute(attributeName, attributeValue);
 				}
+			}
+		}
+	};
+
+	//Applies the keyframes (as data-attributes) to the elements.
+	var applyAttributeSetters = function(selectors) {
+		var curSelector;
+		var elements;
+		var attributeName;
+		var attributeValue;
+		var elementIndex;
+
+		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
+			curSelector = selectors[selectorIndex];
+			elements = document.querySelectorAll(curSelector[0]);
+			attributeName = 'data-' + curSelector[1];
+			attributeValue = curSelector[2];
+
+			if(!elements) {
+				continue;
+			}
+
+			for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+				elements[elementIndex].setAttribute(attributeName, attributeValue);
 			}
 		}
 	};
