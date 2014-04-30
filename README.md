@@ -78,6 +78,26 @@ Example
 
 **Heads up:** Since external stylesheets are fetched using AJAX (more like SJACSS, but that's not the point here) the same origin policy applies which prohibits AJAX requests when viewing files using the `file://` protocol. Either fire up a local server (e.g. `npm install http-server -g && http-server` or `php -S localhost:8080`) or start Chrome using `google-chrome --disable-web-security`.
 
+Attributes
+----------
+
+Apart from keyframes skrollr also uses attributes for other things, for examaple `data-anchor-target`. In order to set attributes from within your stylesheet, just do this:
+
+```css
+#foo {
+	-skrollr-anchor-target: '#bar';
+}
+```
+
+which results in
+
+```html
+<div id="foo" data-anchor-target="#bar"></div>
+```
+
+Supported attributes are: `data-anchor-target`, `data-smooth-scrolling` and `data-emit-events`.
+
+
 Media queries
 -----
 
@@ -134,6 +154,11 @@ skrollr-stylesheets tries to mimic the way normal CSS works in terms of inherita
 
 Changelog
 =====
+
+0.0.5 (2014-04-30)
+------------------
+
+* Attributes likes `data-anchor-target` can now be set as well (#10).
 
 0.0.4 (2013-05-27)
 -----
