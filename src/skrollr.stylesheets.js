@@ -24,7 +24,7 @@
 	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*([\w-]+)/g;
 
 	//Finds usages of attribute setters.
-	var rxAttributeSetter = /-skrollr-(anchor-target|smooth-scrolling|emit-events)\s*:\s*['"]([^'"]+)['"]/g;
+	var rxAttributeSetter = /-skrollr-(anchor-target|smooth-scrolling|emit-events|menu-offset)\s*:\s*['"]([^'"]+)['"]/g;
 
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
