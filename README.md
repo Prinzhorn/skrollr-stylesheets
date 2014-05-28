@@ -95,7 +95,7 @@ which results in
 <div id="foo" data-anchor-target="#bar"></div>
 ```
 
-Supported attributes are: `data-anchor-target`, `data-smooth-scrolling` and `data-emit-events`.
+Supported attributes are: `data-anchor-target`, `data-smooth-scrolling`, `data-emit-events`, and `data-menu-offset`.
 
 
 Media queries
