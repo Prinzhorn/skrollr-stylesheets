@@ -1,5 +1,5 @@
-skrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
-===================
+skrollr-stylesheets 0.0.6
+=========================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
 
@@ -155,23 +155,28 @@ skrollr-stylesheets tries to mimic the way normal CSS works in terms of inherita
 Changelog
 =====
 
+0.0.6 (2014-05-28)
+------------------
+
+* Added `data-menu-offset` to the list of attributes (#41).
+
 0.0.5 (2014-04-30)
 ------------------
 
 * Attributes likes `data-anchor-target` can now be set as well (#10).
 
 0.0.4 (2013-05-27)
------
+------------------
 
 * Allow dashes in animation names just like in CSS animations (#18)
 
 0.0.3 (2013-05-15)
------
+------------------
 
 * Added support for `media` attribute on external stylesheets.
 
 0.0.2 (2013-04-12)
------
+------------------
 
 * Fixed several issues with IE.
 * **breaking**: The logic of `data-no-skrollr` has been inversed. The attribute has been removed. Instead add `data-skrollr-stylesheet` to explicitly parse this external stylesheet.
