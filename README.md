@@ -1,4 +1,4 @@
-eskrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
+skrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
 ===================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
