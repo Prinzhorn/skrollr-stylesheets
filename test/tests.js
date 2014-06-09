@@ -50,3 +50,42 @@ test('Stylesheet with media attribute', function() {
 	equal(media.attr('data-0'), 'left:100px;', '#media 0');
 	equal(media.attr('data-100'), 'left:200px;', '#media 100');
 });
+
+test('Class attributes without trailing spaces', function() {
+	var media = $('#semi-colons');
+
+	equal(media.attr('data-0'), 'left: 1px;top: 1px;', '#semi-colons 0');
+});
+
+test('Stylesheet with multiple @-skrollr-keyframes and no trailing spaces', function() {
+	var mk = $('#multiple-keyframes');
+
+  /*
+  When the two 0 keyframes are combined from the
+  two examples you end up with this:
+
+    0{left:100px;bottom:100pxright:100px;top:100px;}
+
+	The order of the attributes are still wrong, based on precedence,
+	but at least they are not broken.. (see next test)
+  */
+
+	equal(mk.attr('data-0'), 'left:100px;bottom:100px;right:100px;top:100px;', '#multiple-keyframes 0');
+	equal(mk.attr('data-100'), 'left:0px;bottom:0px;right:0px;top:0px;', '#multiple-keyframes 100');
+	equal(mk.attr('data-1000'), 'left:-100px;bottom:-100px;', '#multiple-keyframes 1000');
+});
+
+test('External stylesheet precedence', function() {
+	var mk = $('#multiple-keyframes');
+
+  /*
+  When two matching keyframes are combined from the
+  same stylesheet, the precedence is incorrect, because
+  the contents are reversed. So the external stylesheets
+  are not in the correct order..
+  */
+
+	equal(mk.attr('data-0'), 'right:100px;top:100px;left:100px;bottom:100px;', '#multiple-keyframes 0');
+	equal(mk.attr('data-100'), 'right:0px;top:0px;left:0px;bottom:0px;', '#multiple-keyframes 100');
+	equal(mk.attr('data-1000'), 'left:-100px;bottom:-100px;', '#multiple-keyframes 1000');
+});
