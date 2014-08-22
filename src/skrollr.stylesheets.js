@@ -28,6 +28,9 @@
 	//Finds usages of the animation.
 	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*([\w-]+)/g;
 
+	//Finds usages of attribute setters.
+	var rxAttributeSetter = /-skrollr-(anchor-target|smooth-scrolling|emit-events|menu-offset)\s*:\s*['"]([^'"]+)['"]/g;
+
 	var fetchRemote = function(url) {
 		var xhr = new XMLHttpRequest();
 
@@ -89,22 +92,23 @@
 
 		var animations = {};
 		var selectors = [];
+		var attributes = [];
 
 		//Now parse all stylesheets.
 		for(var contentIndex = 0; contentIndex < contents.length; contentIndex++) {
 			content = contents[contentIndex];
 
-			parseDeclarations(content, animations);
-
-			parseUsage(content, selectors);
+			parseAnimationDeclarations(content, animations);
+			parseAnimationUsage(content, selectors);
+			parseAttributeSetters(content, attributes);
 		}
 
-		//Apply the keyframes to the elements.
-		applyKeyframes(animations, selectors);
+		applyKeyframeAttributes(animations, selectors);
+		applyAttributeSetters(attributes);
 	};
 
 	//Finds animation declarations and puts them into the output map.
-	var parseDeclarations = function(input, output) {
+	var parseAnimationDeclarations = function(input, output) {
 		rxAnimation.lastIndex = 0;
 
 		var animation;
@@ -131,34 +135,60 @@
 		}
 	};
 
+	//Extracts the selector of the given block by walking backwards to the start of the block.
+	var extractSelector = function(input, startIndex) {
+		var begin;
+		var end = startIndex;
+
+		//First find the curly bracket that opens this block.
+		while(end-- && input.charAt(end) !== '{') {}
+
+		//The end is now fixed to the right of the selector.
+		//Now start there to find the begin of the selector.
+		begin = end;
+
+		//Now walk farther backwards until we grabbed the whole selector.
+		//This either ends at beginning of string or at end of next block.
+		while(begin-- && input.charAt(begin - 1) !== '}') {}
+
+		//Return the cleaned selector.
+		return input.substring(begin, end).replace(/[\n\r\t]/g, '');
+	};
+
 	//Finds usage of animations and puts the selectors into the output array.
-	var parseUsage = function(input, output) {
+	var parseAnimationUsage = function(input, output) {
+		var match;
+		var selector;
+
 		rxAnimationUsage.lastIndex = 0;
 
-		var match;
-		var begin;
-		var end;
-
 		while((match = rxAnimationUsage.exec(input)) !== null) {
-			//This match is inside a style declaration.
-			//We need to walk backwards to find the selector.
-
-			//First find the curly bracket that opens this block.
-			end = rxAnimationUsage.lastIndex;
-			while(end-- && input.charAt(end) !== '{') {}
-
-			//Now walk farther backwards until we grabbed the whole selector.
-			//This either ends at beginning of string or at end of next block.
-			begin = end;
-			while(begin-- && input.charAt(begin - 1) !== '}') {}
+			//Extract the selector of the block we found the animation in.
+			selector = extractSelector(input, rxAnimationUsage.lastIndex);
 
 			//Associate this selector with the animation name.
-			output.push([input.substring(begin, end).replace(/[\n\r\t]/g, ''), match[1]]);
+			output.push([selector, match[1]]);
+		}
+	};
+
+	//Finds usage of attribute setters and puts the selector and attribute data into the output array.
+	var parseAttributeSetters = function(input, output) {
+		var match;
+		var selector;
+
+		rxAttributeSetter.lastIndex = 0;
+
+		while((match = rxAttributeSetter.exec(input)) !== null) {
+			//Extract the selector of the block we found the animation in.
+			selector = extractSelector(input, rxAttributeSetter.lastIndex);
+
+			//Associate this selector with the attribute name and value.
+			output.push([selector, match[1], match[2]]);
 		}
 	};
 
 	//Applies the keyframes (as data-attributes) to the elements.
-	var applyKeyframes = function(animations, selectors) {
+	var applyKeyframeAttributes = function(animations, selectors) {
 		var elements;
 		var keyframes;
 		var keyframeName;
@@ -195,8 +225,32 @@
 					if(attributeValue[attributeValue.length - 1] != ';') {
 						attributeValue += ';';
 					}
-					elements[elementIndex].setAttribute(attributeName, attributeValue);
+					curElement.setAttribute(attributeName, attributeValue);
 				}
+			}
+		}
+	};
+
+	//Applies the keyframes (as data-attributes) to the elements.
+	var applyAttributeSetters = function(selectors) {
+		var curSelector;
+		var elements;
+		var attributeName;
+		var attributeValue;
+		var elementIndex;
+
+		for(var selectorIndex = 0; selectorIndex < selectors.length; selectorIndex++) {
+			curSelector = selectors[selectorIndex];
+			elements = document.querySelectorAll(curSelector[0]);
+			attributeName = 'data-' + curSelector[1];
+			attributeValue = curSelector[2];
+
+			if(!elements) {
+				continue;
+			}
+
+			for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+				elements[elementIndex].setAttribute(attributeName, attributeValue);
 			}
 		}
 	};

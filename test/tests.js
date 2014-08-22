@@ -51,6 +51,12 @@ test('Stylesheet with media attribute', function() {
 	equal(media.attr('data-100'), 'left:200px;', '#media 100');
 });
 
+test('Adding attributes like data-anchor-target', function() {
+	var external = $('#external');
+
+	equal(external.attr('data-anchor-target'), '.dynamic-anchor > .target', '#external[anchor-target]');
+});
+
 test('Class attributes without trailing spaces', function() {
 	var media = $('#semi-colons');
 

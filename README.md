@@ -1,5 +1,5 @@
-skrollr-stylesheets (v 0.0.4, yes, it's _that_ hot)
-===================
+skrollr-stylesheets 0.0.6
+=========================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
 
@@ -8,7 +8,7 @@ See https://github.com/Prinzhorn/skrollr for infos on skrollr.
 Documentation
 =====
 
-This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses your stylesheets (`link` and `style` elements) and adds the information to the document as skrollr compatible data-attributes. After skrollr-stylesheets did it's job, you can use skrollr they way you're used to, just as if you had put the data-attributes on the elements manually.
+This is a completely separate project. skrollr-stylesheets does not depend on skrollr in any way. It parses your stylesheets (`link` and `style` elements) and adds the information to the document as skrollr compatible data-attributes. After skrollr-stylesheets did it's job, you can use skrollr the way you're used to, just as if you had put the data-attributes on the elements manually.
 
 When I say "parsing" I mean it's using regular expressions. Thus you should avoid doing funky stuff inside your CSS files (actually, comments at the wrong place could break the current version). Just put all skrollr related things in one file and keep it clean.
 
@@ -78,6 +78,26 @@ Example
 
 **Heads up:** Since external stylesheets are fetched using AJAX (more like SJACSS, but that's not the point here) the same origin policy applies which prohibits AJAX requests when viewing files using the `file://` protocol. Either fire up a local server (e.g. `npm install http-server -g && http-server` or `php -S localhost:8080`) or start Chrome using `google-chrome --disable-web-security`.
 
+Attributes
+----------
+
+Apart from keyframes skrollr also uses attributes for other things, for examaple `data-anchor-target`. In order to set attributes from within your stylesheet, just do this:
+
+```css
+#foo {
+	-skrollr-anchor-target: '#bar';
+}
+```
+
+which results in
+
+```html
+<div id="foo" data-anchor-target="#bar"></div>
+```
+
+Supported attributes are: `data-anchor-target`, `data-smooth-scrolling`, `data-emit-events`, and `data-menu-offset`.
+
+
 Media queries
 -----
 
@@ -135,18 +155,28 @@ skrollr-stylesheets tries to mimic the way normal CSS works in terms of inherita
 Changelog
 =====
 
+0.0.6 (2014-05-28)
+------------------
+
+* Added `data-menu-offset` to the list of attributes (#41).
+
+0.0.5 (2014-04-30)
+------------------
+
+* Attributes likes `data-anchor-target` can now be set as well (#10).
+
 0.0.4 (2013-05-27)
------
+------------------
 
 * Allow dashes in animation names just like in CSS animations (#18)
 
 0.0.3 (2013-05-15)
------
+------------------
 
 * Added support for `media` attribute on external stylesheets.
 
 0.0.2 (2013-04-12)
------
+------------------
 
 * Fixed several issues with IE.
 * **breaking**: The logic of `data-no-skrollr` has been inversed. The attribute has been removed. Instead add `data-skrollr-stylesheet` to explicitly parse this external stylesheet.
