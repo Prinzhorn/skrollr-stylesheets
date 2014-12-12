@@ -206,10 +206,10 @@
 			keyframes = animations[selectors[selectorIndex][1]];
 
 			for(keyframeName in keyframes) {
-				cleanKeyframeName = keyframeName;
-
-				if (keyframeName.indexOf(keyframeNameOptionalPrefix) === 0) {
+				if(keyframeName.indexOf(keyframeNameOptionalPrefix) === 0) {
 					cleanKeyframeName = keyframeName.substring(keyframeNameOptionalPrefix.length);
+				} else {
+					cleanKeyframeName = keyframeName;
 				}
 
 				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {

@@ -1,4 +1,4 @@
-skrollr-stylesheets 0.0.6
+skrollr-stylesheets 1.0.0
 =========================
 
 Allows separation of skrollr keyframes and the document by putting them inside your stylesheets, in **under 1kb** (minified + gzipped). Works in all browsers including IE8+.
@@ -33,6 +33,11 @@ together with this CSS (inside any `style` or `link`)
 	}
 
 	2000 {
+		left:0%;
+	}
+
+	/*Same as*/
+	skrollr-2000 {
 		left:0%;
 	}
 
@@ -126,12 +131,12 @@ $about_section_duration: 2000;
 $about_section_end: $about_section_begin + $about_section_duration;
 
 @-skrollr-keyframes animation1 {
-	#{$about_section_begin} {
+	skrollr-#{$about_section_begin} {
 		left:100%;
 		opacity#{"[swing]"}: 0.0;
 	}
 
-	#{$about_section_end} {
+	skrollr-#{$about_section_end} {
 		left:0%;
 		opacity: 1.0;
 	}
@@ -141,6 +146,8 @@ $about_section_end: $about_section_begin + $about_section_duration;
 _\*mind blown\*_
 
 And of course you can use all the things you already love about Sass as well.
+
+Note that I used the `skrollr-` prefix in front of the numbers. That's because starting with Sass 3.4 identifiers starting with a number don't compile anymore (as they're invalid CSS).
 
 Note that easing functions need to be interpolated as strings in Sass because of the non-standard syntax.
 
@@ -154,6 +161,11 @@ skrollr-stylesheets tries to mimic the way normal CSS works in terms of inherita
 
 Changelog
 =====
+
+1.0.0 (2014-12-12)
+------------------
+
+* Allow keyframes to be prefixed with `skrollr-` to avoid SASS issues (#47).
 
 0.0.6 (2014-05-28)
 ------------------
