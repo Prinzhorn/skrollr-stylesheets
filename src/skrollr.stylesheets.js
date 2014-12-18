@@ -1,5 +1,10 @@
 /*!
  * skrollr stylesheets.
+ *
+ * Alexander Prinzhorn
+ * https://github.com/Prinzhorn/skrollr-stylesheets
+ * Free to use under terms of MIT license
+ *
  * Parses stylesheets and searches for skrollr keyframe declarations.
  * Converts them to data-attributes.
  * Doesn't expose any globals.
@@ -221,9 +226,15 @@
 					//The inline one may actually be the result of the keyframes from another stylesheet.
 					//Since we reversed the order of the stylesheets, everything comes together correctly here.
 					if(curElement.hasAttribute(attributeName)) {
+						if(attributeValue[attributeValue.length - 1] != ';') {
+							attributeValue += ';';
+						}
 						attributeValue += curElement.getAttribute(attributeName);
 					}
 
+					if(attributeValue[attributeValue.length - 1] != ';') {
+						attributeValue += ';';
+					}
 					curElement.setAttribute(attributeName, attributeValue);
 				}
 			}

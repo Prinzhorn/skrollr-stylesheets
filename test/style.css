@@ -55,3 +55,38 @@
 		top:100px;
 	}
 }
+
+/*
+  CSS parsers such as LESS, SASS (SCSS), etc.,
+  trim the trailing semi-colons from the last attribute
+  of class definitions. Also, people are lazy.
+
+  Either of the situations above could leave the CSS
+  code looking similar to the examples below.
+*/
+
+#semi-colons {
+	-skrollr-animation-name: semi-colons;
+}
+
+@-skrollr-keyframes semi-colons {
+	0 {
+		left: 1px;
+		top: 1px
+	}
+}
+
+#multiple-keyframes{-skrollr-animation-name:multiple-skrollr-keyframes-1;}
+
+@-skrollr-keyframes multiple-skrollr-keyframes-1{
+	0{right:100px;top:100px} 100{right:0px;top:0px}
+}
+
+.mk{-skrollr-animation-name:multiple-skrollr-keyframes-2;}
+
+@-skrollr-keyframes multiple-skrollr-keyframes-2{
+	0{left:100px;bottom:100px} 100{left:0px;bottom:0px} 1000{left:-100px;bottom:-100px}
+}
+
+
+
