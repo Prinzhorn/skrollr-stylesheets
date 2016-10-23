@@ -103,6 +103,11 @@
 
 		applyKeyframeAttributes(animations, selectors);
 		applyAttributeSetters(attributes);
+
+		var instance = skrollr.get();
+		if (instance) {
+			instance.refresh();
+		}
 	};
 
 	//Finds animation declarations and puts them into the output map.
