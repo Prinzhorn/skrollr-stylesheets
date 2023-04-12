@@ -9,6 +9,13 @@ test('Elements with ID selector', function() {
 	equal(simple2.attr('data-bottom'), 'margin:100px;color:rgb(255,255,255);', '#simple2 bottom');
 });
 
+test('Elements with prefixed keyframes', function() {
+	var prefixed = $('#prefixed');
+
+	equal(prefixed.attr('data-0'), 'left:0px;', '#prefixed 0');
+	equal(prefixed.attr('data-100'), 'left:100px;', '#prefixed 100');
+});
+
 test('Elements with complex selectors', function() {
 	var complex1 = $('#complex1');
 

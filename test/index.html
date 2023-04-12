@@ -25,6 +25,10 @@
 		-skrollr-animation-name: test3;
 	}
 
+	#prefixed {
+		-skrollr-animation-name: testprefixed;
+	}
+
 	@-skrollr-keyframes test1 {
 		bottom-top {
 			left:100%;
@@ -58,6 +62,15 @@
 		}
 	}
 
+	@-skrollr-keyframes testprefixed {
+		skrollr-0 {
+			left:0px;
+		}
+		skrollr-100 {
+			left:100px;
+		}
+	}
+
 	#precedence {
 		-skrollr-animation-name:precedence2;
 	}
@@ -86,6 +99,8 @@
 <body>
 	<div id="simple1"></div>
 	<div id="simple2"></div>
+
+	<div id="prefixed"></div>
 
 	<div id="complex1" class="complex"></div>
 

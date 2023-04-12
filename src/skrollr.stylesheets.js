@@ -25,6 +25,9 @@
 	//Gets a single keyframe and the properties inside.
 	var rxSingleKeyframe = /([\w\-]+)\s*\{([^}]+)\}/g;
 
+	//Optional keyframe name prefix to work around SASS (>3.4) issues
+	var keyframeNameOptionalPrefix = 'skrollr-';
+
 	//Finds usages of the animation.
 	var rxAnimationUsage = /-skrollr-animation-name\s*:\s*([\w-]+)/g;
 
@@ -192,6 +195,7 @@
 		var elements;
 		var keyframes;
 		var keyframeName;
+		var cleanKeyframeName;
 		var elementIndex;
 		var attributeName;
 		var attributeValue;
@@ -207,9 +211,15 @@
 			keyframes = animations[selectors[selectorIndex][1]];
 
 			for(keyframeName in keyframes) {
+				if(keyframeName.indexOf(keyframeNameOptionalPrefix) === 0) {
+					cleanKeyframeName = keyframeName.substring(keyframeNameOptionalPrefix.length);
+				} else {
+					cleanKeyframeName = keyframeName;
+				}
+
 				for(elementIndex = 0; elementIndex < elements.length; elementIndex++) {
 					curElement = elements[elementIndex];
-					attributeName = 'data-' + keyframeName;
+					attributeName = 'data-' + cleanKeyframeName;
 					attributeValue = keyframes[keyframeName];
 
 					//If the element already has this keyframe inline, give the inline one precedence by putting it on the right side.
